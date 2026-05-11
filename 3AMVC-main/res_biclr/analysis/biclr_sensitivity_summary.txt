@@ -1,0 +1,23 @@
+BIC-LR 超参数敏感度分析摘要
+分析时间：2026-05-09 21:00:06
+
+数据集 Caltech101-all：使用文件 Caltech101_all_BICLR_grid_20260509_204041.mat（54 组参数）。
+最优 ACC=0.2802，对应 beta=10, lambda=1000, lambdaBIC=1, minNodeSize=80，总锚点数=515，NMI=0.4515。
+95% 最优 ACC 区间内共有 11/54 组参数；beta 候选=10，lambda 候选=[100 1000 10000]，lambdaBIC 候选=[1 2]，minNodeSize 候选=[40 80 160]。
+边际敏感度排序：1) beta(0.0375, 最优=10) 2) lambdaBIC(0.0222, 最优=1) 3) minNodeSize(0.0178, 最优=40) 4) lambda(0.0022, 最优=100)。
+ 
+数据集 MFeat_2Views：使用文件 MFeat_2Views_BICLR_grid_20260509_200331.mat（81 组参数）。
+最优 ACC=0.8995，对应 beta=100, lambda=1000, lambdaBIC=0.5, minNodeSize=40，总锚点数=74，NMI=0.8483。
+95% 最优 ACC 区间内共有 12/81 组参数；beta 候选=100，lambda 候选=[1000 10000 100000]，lambdaBIC 候选=[0.5 1 2]，minNodeSize 候选=[10 40]。
+边际敏感度排序：1) beta(0.3201, 最优=100) 2) minNodeSize(0.1634, 最优=40) 3) lambdaBIC(0.0843, 最优=2) 4) lambda(0.0031, 最优=100000)。
+ 
+数据集 Reuters-1200：使用文件 Reuters_1200_BICLR_grid_20260509_195924.mat（81 组参数）。
+最优 ACC=0.5910，对应 beta=100, lambda=100, lambdaBIC=0.5, minNodeSize=8，总锚点数=164，NMI=0.3534。
+95% 最优 ACC 区间内共有 3/81 组参数；beta 候选=100，lambda 候选=[100 1000 10000]，lambdaBIC 候选=0.5，minNodeSize 候选=8。
+边际敏感度排序：1) lambdaBIC(0.1135, 最优=1) 2) beta(0.0466, 最优=10) 3) minNodeSize(0.0357, 最优=8) 4) lambda(0.0006, 最优=10000)。
+ 
+数据集 Wikifea：使用文件 Wikifea_BICLR_grid_20260509_200910.mat（108 组参数）。
+最优 ACC=0.5376，对应 beta=100, lambda=1000, lambdaBIC=4, minNodeSize=40，总锚点数=54，NMI=0.4876。
+95% 最优 ACC 区间内共有 8/108 组参数；beta 候选=100，lambda 候选=[100 1000 10000]，lambdaBIC 候选=[2 4]，minNodeSize 候选=[10 40]。
+边际敏感度排序：1) beta(0.1505, 最优=100) 2) lambdaBIC(0.0825, 最优=4) 3) minNodeSize(0.0144, 最优=20) 4) lambda(0.0084, 最优=100)。
+ 

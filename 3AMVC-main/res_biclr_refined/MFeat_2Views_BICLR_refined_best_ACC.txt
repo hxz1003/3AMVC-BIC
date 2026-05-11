@@ -1,0 +1,21 @@
+BIC-LR 精细搜索最优 ACC 结果
+数据集：MFeat_2Views
+来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\MFeat_2Views_BICLR_grid_20260509_225119.mat
+选择准则：ACC
+beta=160
+lambda=10000
+lambdaBIC=1
+minNodeSize=40
+tauSplit=0
+epsVar=1e-08
+randomSeed=1
+numRuns=10
+kmeansReplicates=4
+anchorCounts=[35 39]
+targetView=1
+ACC=0.905300 ± 0.006783
+NMI=0.840251 ± 0.006717
+Purity=0.905300 ± 0.006783
+Fscore=0.827187 ± 0.010952
+总耗时=877.35s
+缓存键=MFeat_2Views_raw_view1_BICLR_lamBIC1_minNode40_seed1, MFeat_2Views_raw_view2_BICLR_lamBIC1_minNode40_seed1

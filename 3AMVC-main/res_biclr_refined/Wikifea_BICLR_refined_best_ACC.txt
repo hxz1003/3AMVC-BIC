@@ -1,0 +1,21 @@
+BIC-LR 精细搜索最优 ACC 结果
+数据集：Wikifea
+来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Wikifea_BICLR_grid_20260509_225718.mat
+选择准则：ACC
+beta=80
+lambda=100
+lambdaBIC=3
+minNodeSize=40
+tauSplit=0
+epsVar=1e-08
+randomSeed=1
+numRuns=8
+kmeansReplicates=4
+anchorCounts=[21 43]
+targetView=1
+ACC=0.567385 ± 0.000947
+NMI=0.517829 ± 0.000770
+Purity=0.605940 ± 0.001269
+Fscore=0.479296 ± 0.001302
+总耗时=1256.18s
+缓存键=Wikifea_raw_view1_BICLR_lamBIC3_minNode40_seed1, Wikifea_raw_view2_BICLR_lamBIC3_minNode40_seed1

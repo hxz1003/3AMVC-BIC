@@ -1,0 +1,21 @@
+BIC-LR 精细搜索最优 ACC 结果
+数据集：Caltech101-all
+来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Caltech101_all_BICLR_grid_20260510_004552.mat
+选择准则：ACC
+beta=10
+lambda=3000
+lambdaBIC=1
+minNodeSize=60
+tauSplit=0
+epsVar=1e-08
+randomSeed=1
+numRuns=6
+kmeansReplicates=3
+anchorCounts=[113 114 116 99 111 114]
+targetView=5
+ACC=0.287693 ± 0.005956
+NMI=0.448799 ± 0.003970
+Purity=0.424067 ± 0.004938
+Fscore=0.221367 ± 0.014000
+总耗时=7685.61s
+缓存键=Caltech101_all_raw_view1_BICLR_lamBIC1_minNode60_seed1, Caltech101_all_raw_view2_BICLR_lamBIC1_minNode60_seed1, Caltech101_all_raw_view3_BICLR_lamBIC1_minNode60_seed1, Caltech101_all_raw_view4_BICLR_lamBIC1_minNode60_seed1, Caltech101_all_raw_view5_BICLR_lamBIC1_minNode60_seed1, Caltech101_all_raw_view6_BICLR_lamBIC1_minNode60_seed1

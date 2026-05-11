@@ -1,0 +1,21 @@
+BIC-LR 精细搜索最优 ACC 结果
+数据集：Reuters-1200
+来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Reuters_1200_BICLR_grid_20260509_224753.mat
+选择准则：ACC
+beta=50
+lambda=1000
+lambdaBIC=0.5
+minNodeSize=8
+tauSplit=0
+epsVar=1e-08
+randomSeed=1
+numRuns=8
+kmeansReplicates=4
+anchorCounts=[34 32 35 31 32]
+targetView=3
+ACC=0.599375 ± 0.030410
+NMI=0.347236 ± 0.012089
+Purity=0.604271 ± 0.019718
+Fscore=0.421125 ± 0.013702
+总耗时=642.08s
+缓存键=Reuters_1200_raw_view1_BICLR_lamBIC0p5_minNode8_seed1, Reuters_1200_raw_view2_BICLR_lamBIC0p5_minNode8_seed1, Reuters_1200_raw_view3_BICLR_lamBIC0p5_minNode8_seed1, Reuters_1200_raw_view4_BICLR_lamBIC0p5_minNode8_seed1, Reuters_1200_raw_view5_BICLR_lamBIC0p5_minNode8_seed1
