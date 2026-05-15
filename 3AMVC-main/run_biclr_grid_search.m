@@ -8,7 +8,8 @@ function results = run_biclr_grid_search(datasetName, config)
 %   config      : 配置结构体，支持字段：
 %                 - betaList / lambdaList / lambdaBICList / minNodeSizeList
 %                 - anchorOptions : 工程参数结构体
-%                 - evalOptions   : 评价参数结构体
+%                 - evalOptions   : 评价参数结构体，其中 summaryMode 可为
+%                                   'mean' 或 'bestACC'
 %                 - preprocessTag : 预处理标签，默认 'raw'
 %                 - useCache      : 是否启用锚点缓存，默认 true
 %                 - saveDir       : 结果保存目录，默认 ./res_biclr
@@ -18,10 +19,14 @@ function results = run_biclr_grid_search(datasetName, config)
 %
 %   输出参数：
 %   results : 结构体，包含数据集信息、所有网格记录、最优组合与保存路径。
+%             bestUpper 为按“重复评价均值+标准差”最高得到的组合，bestMean
+%             为按重复评价均值最高得到的组合；bestSummary 保留原选优汇总
+%             指标最高组合，best 保持兼容，等同 bestSummary。
 %
 %   注意事项：
 %   1. 锚点缓存只按 dataset/preprocess/view/lambdaBIC/minNodeSize/seed/method 复用。
-%   2. 本函数默认以 ACC 作为最优参数的主排序指标；若 ACC 相同，则依次参考
+%   2. 基准视图按单位 BIC 证据增益最大选择，qualityScores 记录为 -S_BIC。
+%   3. 本函数默认以 ACC 作为最优参数的主排序指标；若 ACC 相同，则依次参考
 %      NMI、Fscore、Purity 和总耗时进行稳定选择。
 
 if nargin < 2
@@ -44,7 +49,7 @@ metrics = {'ACC', 'NMI', 'Purity', 'Fscore', 'Precision', 'Recall', 'AR', 'Entro
 totalComb = numel(config.betaList) * numel(config.lambdaList) ...
     * numel(config.lambdaBICList) * numel(config.minNodeSizeList);
 
-records(totalComb, 1) = init_record_struct(metrics); %#ok<AGROW>
+records(totalComb, 1) = init_record_struct(metrics);
 recordId = 0;
 globalTimer = tic;
 
@@ -72,8 +77,8 @@ for ibic = 1:numel(config.lambdaBICList)
                 recordId = recordId + 1;
 
                 runTimer = tic;
-                [U, A, Z, iter, obj] = algo_qp(X, Y, thetaall, beta, lambda, targetView);
-                [metricMean, metricStd] = myNMIACCwithmean(U, Y, k, config.evalOptions);
+                [U, A, Z, iter, obj, traceInfo] = algo_qp(X, Y, thetaall, beta, lambda, targetView);
+                [metricMean, metricStd, evalInfo] = myNMIACCwithmean(U, Y, k, config.evalOptions);
                 algoTime = toc(runTimer);
 
                 rec = init_record_struct(metrics);
@@ -88,11 +93,23 @@ for ibic = 1:numel(config.lambdaBICList)
                 rec.anchorCounts = cellfun(@(s) s.numAnchors, infoAll);
                 rec.targetView = targetView;
                 rec.anchorQuality = qualityScores;
+                rec.anchorQualityMethod = 'BICUnitEvidenceGain';
+                rec.anchorEvidenceGain = -qualityScores(:);
+                rec.anchorSSE = cellfun(@(s) s.totalSSE, infoAll);
                 rec.iter = iter;
-                rec.objFinal = obj(end);
+                rec.objFinal = get_trace_final(traceInfo.objectiveTraceForPlot, obj);
+                rec.graphObjFinal = obj(end);
                 rec.metricsMean = metricMean;
                 rec.metricsStd = metricStd;
                 rec.metricNames = metrics;
+                rec.evalSummaryMode = evalInfo.summaryMode;
+                rec.evalMeanMetrics = evalInfo.meanMetrics;
+                rec.evalStdMetrics = evalInfo.stdMetrics;
+                rec.evalMinMetrics = evalInfo.minMetrics;
+                rec.evalMaxMetrics = evalInfo.maxMetrics;
+                rec.bestEvalRun = evalInfo.bestRunIndex;
+                rec.bestEvalSeed = evalInfo.bestRunSeed;
+                rec.bestEvalMetrics = evalInfo.bestRunMetrics;
                 rec.algoTime = algoTime;
                 rec.anchorTime = anchorTime;
                 rec.totalTime = anchorTime + algoTime;
@@ -103,7 +120,12 @@ for ibic = 1:numel(config.lambdaBICList)
                 rec.numRuns = config.evalOptions.numRuns;
                 rec.kmeansReplicates = config.evalOptions.kmeansReplicates;
                 rec.useParallel = config.evalOptions.useParallel;
-                rec.objTrace = obj(:)';
+                rec.objTrace = traceInfo.objectiveTraceForPlot(:)';
+                rec.objTraceType = traceInfo.objectiveTraceType;
+                rec.graphObjTrace = obj(:)';
+                rec.alignmentMaxObjectiveTrace = traceInfo.alignmentMaxObjectiveTrace(:)';
+                rec.alignmentLossObjectiveTrace = traceInfo.alignmentLossObjectiveTrace(:)';
+                rec.alignmentTraceInfo = make_alignment_trace_summary(traceInfo.alignmentInfo);
                 if config.storeDetailedModel
                     rec.thetaall = thetaall;
                     rec.labelAll = labelAll;
@@ -111,30 +133,45 @@ for ibic = 1:numel(config.lambdaBICList)
                     rec.infoAll = infoAll;
                     rec.A = A;
                     rec.Z = Z;
+                    rec.evalAllMetrics = evalInfo.allMetrics;
                 end
 
                 records(recordId) = rec;
 
                 fprintf(['[Grid][%d/%d] %s | beta=%g | lambda=%g | lambdaBIC=%g | ' ...
-                    'minNodeSize=%d | anchors=%s | targetView=%d | ' ...
-                    'ACC=%.4f | NMI=%.4f | Purity=%.4f | Fscore=%.4f | ' ...
+                    'minNodeSize=%d | anchors=%s | targetView=%d | BICUnitEvidence=%s | ' ...
+                    'eval=%s | summaryACC=%.4f | bestRun=%d | ' ...
+                    'ACC=%.4f±%.4f | NMI=%.4f±%.4f | Purity=%.4f±%.4f | Fscore=%.4f±%.4f | ' ...
                     'algoTime=%.2fs | anchorTime=%.2fs\n'], ...
                     recordId, totalComb, datasetName, beta, lambda, lambdaBIC, minNodeSize, ...
-                    mat2str(rec.anchorCounts'), targetView, metricMean(1), metricMean(2), ...
-                    metricMean(3), metricMean(4), algoTime, anchorTime);
+                    mat2str(rec.anchorCounts'), targetView, mat2str(rec.anchorEvidenceGain', 4), ...
+                    rec.evalSummaryMode, metricMean(1), rec.bestEvalRun, ...
+                    rec.evalMeanMetrics(1), rec.evalStdMetrics(1), ...
+                    rec.evalMeanMetrics(2), rec.evalStdMetrics(2), ...
+                    rec.evalMeanMetrics(3), rec.evalStdMetrics(3), ...
+                    rec.evalMeanMetrics(4), rec.evalStdMetrics(4), ...
+                    algoTime, anchorTime);
             end
         end
     end
 end
 
-bestIdx = select_best_record(records, config.selectionMetricName);
+bestSummaryIdx = select_best_record(records, config.selectionMetricName, 'summary');
+bestUpperIdx = select_best_record(records, config.selectionMetricName, 'upper');
+bestMeanIdx = select_best_record(records, config.selectionMetricName, 'mean');
 results = struct();
 results.datasetName = datasetName;
 results.meta = meta;
 results.config = config;
 results.records = records;
-results.best = records(bestIdx);
-results.bestIndex = bestIdx;
+results.best = records(bestSummaryIdx);
+results.bestIndex = bestSummaryIdx;
+results.bestSummary = records(bestSummaryIdx);
+results.bestSummaryIndex = bestSummaryIdx;
+results.bestUpper = records(bestUpperIdx);
+results.bestUpperIndex = bestUpperIdx;
+results.bestMean = records(bestMeanIdx);
+results.bestMeanIndex = bestMeanIdx;
 results.selectionMetricName = config.selectionMetricName;
 results.totalTime = toc(globalTimer);
 
@@ -148,13 +185,55 @@ results.savePath = savePath;
 save(savePath, 'results', '-v7.3');
 
 fprintf('===== BIC-LR 网格搜索结束 =====\n');
-fprintf(['按 %s 最高选择最优结果：beta=%g，lambda=%g，lambdaBIC=%g，minNodeSize=%d，' ...
-    'ACC=%.4f，NMI=%.4f，Purity=%.4f，Fscore=%.4f，总耗时=%.2fs\n'], ...
-    config.selectionMetricName, results.best.beta, results.best.lambda, results.best.lambdaBIC, ...
-    results.best.minNodeSize, results.best.metricsMean(1), ...
-    results.best.metricsMean(2), results.best.metricsMean(3), ...
-    results.best.metricsMean(4), results.totalTime);
+print_best_record('按重复评价均值+标准差上界', config.selectionMetricName, results.bestUpper, results.totalTime);
+print_best_record('按重复评价平均', config.selectionMetricName, results.bestMean, results.totalTime);
 fprintf('结果已保存到：%s\n', savePath);
+end
+
+function print_best_record(prefixText, selectionMetricName, record, totalTime)
+[meanMetrics, stdMetrics] = get_eval_mean_std(record);
+fprintf(['%s %s 最高选择结果：beta=%g，lambda=%g，lambdaBIC=%g，minNodeSize=%d，' ...
+    'ACC=%.4f±%.4f，NMI=%.4f±%.4f，Purity=%.4f±%.4f，Fscore=%.4f±%.4f，' ...
+    'summaryACC=%.4f，总耗时=%.2fs\n'], ...
+    prefixText, selectionMetricName, record.beta, record.lambda, record.lambdaBIC, ...
+    record.minNodeSize, meanMetrics(1), stdMetrics(1), ...
+    meanMetrics(2), stdMetrics(2), meanMetrics(3), stdMetrics(3), ...
+    meanMetrics(4), stdMetrics(4), record.metricsMean(1), totalTime);
+end
+
+function [meanMetrics, stdMetrics] = get_eval_mean_std(record)
+if isfield(record, 'evalMeanMetrics') && ~isempty(record.evalMeanMetrics)
+    meanMetrics = record.evalMeanMetrics;
+else
+    meanMetrics = record.metricsMean;
+end
+if isfield(record, 'evalStdMetrics') && ~isempty(record.evalStdMetrics)
+    stdMetrics = record.evalStdMetrics;
+else
+    stdMetrics = record.metricsStd;
+end
+end
+
+function value = get_trace_final(plotTrace, graphObjTrace)
+if ~isempty(plotTrace)
+    value = plotTrace(end);
+elseif ~isempty(graphObjTrace)
+    value = graphObjTrace(end);
+else
+    value = NaN;
+end
+end
+
+function summary = make_alignment_trace_summary(alignmentInfo)
+summary = struct();
+summary.targetView = alignmentInfo.targetView;
+summary.lambda = alignmentInfo.lambda;
+summary.objectiveName = alignmentInfo.objectiveName;
+summary.lossName = alignmentInfo.lossName;
+summary.maxObjectiveTraceByView = alignmentInfo.maxObjectiveTraceByView;
+summary.lossObjectiveTraceByView = alignmentInfo.lossObjectiveTraceByView;
+summary.totalMaxObjectiveTrace = alignmentInfo.totalMaxObjectiveTrace;
+summary.totalLossObjectiveTrace = alignmentInfo.totalLossObjectiveTrace;
 end
 
 function config = fill_grid_config(datasetName, config, rootDir)
@@ -177,7 +256,8 @@ defaultConfig.evalOptions = struct( ...
     'numRuns', defaultGrids.numRuns, ...
     'kmeansReplicates', defaultGrids.kmeansReplicates, ...
     'useParallel', false, ...
-    'baseSeed', 1);
+    'baseSeed', 1, ...
+    'summaryMode', 'mean');
 defaultConfig.preprocessTag = 'raw';
 defaultConfig.useCache = true;
 defaultConfig.saveDir = fullfile(rootDir, 'res_biclr');
@@ -227,12 +307,28 @@ switch lower(datasetName)
         grid.maxAnchors = 500;
         grid.numRuns = 4;
         grid.kmeansReplicates = 2;
+    case 'caltech256_4views_257cls_withclutter'
+        grid.betaList = [10 100];
+        grid.lambdaList = [1e3 1e4];
+        grid.lambdaBICList = [2 4];
+        grid.minNodeSizeList = [80 160];
+        grid.maxAnchors = 600;
+        grid.numRuns = 3;
+        grid.kmeansReplicates = 1;
     case 'wikifea'
         grid.betaList = [1 10 100];
         grid.lambdaList = [1e2 1e3 1e4];
         grid.lambdaBICList = [0.5 1 2 4];
         grid.minNodeSizeList = [10 20 40];
         grid.maxAnchors = 400;
+        grid.numRuns = 6;
+        grid.kmeansReplicates = 3;
+    case 'foresttypes'
+        grid.betaList = [1 10 100];
+        grid.lambdaList = [1e1 1e2 1e3];
+        grid.lambdaBICList = [0.5 1 2];
+        grid.minNodeSizeList = [5 10 20];
+        grid.maxAnchors = 200;
         grid.numRuns = 6;
         grid.kmeansReplicates = 3;
     otherwise
@@ -259,10 +355,12 @@ if config.useCache && ~exist(config.cacheDir, 'dir')
 end
 
 for iv = 1:numViews
-    cacheKey = sprintf('%s_%s_view%d_BICLR_lamBIC%s_minNode%d_seed%d', ...
+    cacheKey = sprintf('%s_%s_view%d_BICLR_lamBIC%s_minNode%d_tau%s_eps%s_seed%d_rmClutter%d_cap%s', ...
         sanitize_key(meta.datasetName), sanitize_key(meta.preprocessTag), iv, ...
         sanitize_numeric(anchorOptions.lambdaBIC), anchorOptions.minNodeSize, ...
-        anchorOptions.randomSeed);
+        sanitize_numeric(anchorOptions.tauSplit), sanitize_numeric(anchorOptions.epsVar), ...
+        anchorOptions.randomSeed, logical(config.removeClutter), ...
+        sanitize_optional_numeric(config.maxPerClass));
     cacheFile = fullfile(config.cacheDir, [cacheKey '.mat']);
     cacheKeys{iv} = cacheKey;
     cacheFiles{iv} = cacheFile;
@@ -273,7 +371,8 @@ for iv = 1:numViews
         objectAll{iv} = loaded.object;
         labelAll{iv} = loaded.label_neighbor;
         infoAll{iv} = loaded.info;
-        qualityScores(iv) = loaded.qualityScore;
+        infoAll{iv} = ensure_view_evidence(X{iv}, objectAll{iv}, labelAll{iv}, infoAll{iv}, anchorOptions);
+        qualityScores(iv) = infoAll{iv}.qualityScore;
         usedCache(iv) = true;
         continue;
     end
@@ -283,7 +382,9 @@ for iv = 1:numViews
     elapsed = toc(anchorTimer);
     totalAnchorTime = totalAnchorTime + elapsed;
 
-    qualityScore = sum(object);
+    info = ensure_view_evidence(X{iv}, object, label_neighbor, info, anchorOptions);
+    qualityScore = info.qualityScore;
+    viewEvidence = info.viewEvidence;
     thetaall{iv} = theta;
     objectAll{iv} = object;
     labelAll{iv} = label_neighbor;
@@ -291,18 +392,50 @@ for iv = 1:numViews
     qualityScores(iv) = qualityScore;
 
     if config.useCache
-        methodName = 'BICLR'; %#ok<NASGU>
-        labelField = meta.labelField; %#ok<NASGU>
+        methodName = 'BICLR';
+        labelField = meta.labelField;
         save(cacheFile, 'theta', 'object', 'label_neighbor', 'info', 'qualityScore', ...
+            'viewEvidence', ...
             'anchorOptions', 'cacheKey', 'methodName', 'labelField');
     end
 end
 
-[~, targetView] = min(qualityScores);
+[targetView, qualityScores, unitGains] = biclr_select_target_view(infoAll);
 cacheInfo = struct();
 cacheInfo.usedCache = usedCache;
 cacheInfo.cacheKeys = cacheKeys;
 cacheInfo.cacheFiles = cacheFiles;
+cacheInfo.qualityMethod = 'BICUnitEvidenceGain';
+cacheInfo.unitGains = unitGains;
+end
+
+function info = ensure_view_evidence(Xv, object, label_neighbor, info, anchorOptions)
+if nargin < 4 || isempty(info)
+    info = struct();
+end
+if ~isfield(info, 'anchorSizes') || isempty(info.anchorSizes)
+    if isempty(label_neighbor)
+        error('run_biclr_grid_search:MissingAnchorSize', '缺少锚点样本数，无法计算 BIC 证据质量。');
+    end
+    labels = label_neighbor(:);
+    validateattributes(labels, {'double', 'single'}, {'vector', 'nonempty', 'integer', 'positive'}, ...
+        mfilename, 'label_neighbor');
+    info.anchorSizes = accumarray(labels, 1);
+end
+if ~isfield(info, 'totalSSE') || isempty(info.totalSSE)
+    info.totalSSE = sum(object);
+end
+if ~isfield(info, 'options') || isempty(info.options)
+    info.options = anchorOptions;
+end
+
+info.viewEvidence = biclr_view_evidence(Xv, object, info.anchorSizes, anchorOptions);
+info.legacySSEQuality = info.totalSSE;
+info.qualityMethod = 'BICUnitEvidenceGain';
+info.qualityScore = info.viewEvidence.qualityScore;
+info.unitBICEvidence = info.viewEvidence.unitGain;
+info.relativeBICEvidence = info.viewEvidence.unitGain;
+info.bicEvidenceGain = info.viewEvidence.deltaBIC;
 end
 
 function rec = init_record_struct(metricNames)
@@ -318,11 +451,23 @@ rec.randomSeed = [];
 rec.anchorCounts = [];
 rec.targetView = [];
 rec.anchorQuality = [];
+rec.anchorQualityMethod = '';
+rec.anchorEvidenceGain = [];
+rec.anchorSSE = [];
 rec.iter = [];
 rec.objFinal = [];
+rec.graphObjFinal = [];
 rec.metricsMean = zeros(1, numel(metricNames));
 rec.metricsStd = zeros(1, numel(metricNames));
 rec.metricNames = metricNames;
+rec.evalSummaryMode = '';
+rec.evalMeanMetrics = zeros(1, numel(metricNames));
+rec.evalStdMetrics = zeros(1, numel(metricNames));
+rec.evalMinMetrics = zeros(1, numel(metricNames));
+rec.evalMaxMetrics = zeros(1, numel(metricNames));
+rec.bestEvalRun = [];
+rec.bestEvalSeed = [];
+rec.bestEvalMetrics = zeros(1, numel(metricNames));
 rec.algoTime = [];
 rec.anchorTime = [];
 rec.totalTime = [];
@@ -334,12 +479,18 @@ rec.numRuns = [];
 rec.kmeansReplicates = [];
 rec.useParallel = false;
 rec.objTrace = [];
+rec.objTraceType = '';
+rec.graphObjTrace = [];
+rec.alignmentMaxObjectiveTrace = [];
+rec.alignmentLossObjectiveTrace = [];
+rec.alignmentTraceInfo = struct();
 rec.thetaall = {};
 rec.labelAll = {};
 rec.objectAll = {};
 rec.infoAll = {};
 rec.A = {};
 rec.Z = [];
+rec.evalAllMetrics = [];
 end
 
 function out = merge_struct(defaultStruct, inputStruct)
@@ -353,9 +504,12 @@ for i = 1:numel(fieldNames)
 end
 end
 
-function bestIdx = select_best_record(records, selectionMetricName)
+function bestIdx = select_best_record(records, selectionMetricName, scoreMode)
 if isempty(records)
     error('run_biclr_grid_search:EmptyRecords', 'records 为空，无法选择最优结果。');
+end
+if nargin < 3 || isempty(scoreMode)
+    scoreMode = 'summary';
 end
 
 metricNames = records(1).metricNames;
@@ -364,7 +518,7 @@ if isempty(primaryIdx)
     error('run_biclr_grid_search:UnknownMetric', '未找到指标 %s。', selectionMetricName);
 end
 
-metricMatrix = vertcat(records.metricsMean);
+metricMatrix = get_selection_metric_matrix(records, scoreMode);
 primaryScore = metricMatrix(:, primaryIdx);
 nmiScore = get_metric_column(metricMatrix, metricNames, 'NMI');
 fscoreScore = get_metric_column(metricMatrix, metricNames, 'Fscore');
@@ -374,6 +528,33 @@ stableIndex = (1:numel(records))';
 
 [~, order] = sortrows([-primaryScore, -nmiScore, -fscoreScore, -purityScore, timeScore, stableIndex]);
 bestIdx = order(1);
+end
+
+function metricMatrix = get_selection_metric_matrix(records, scoreMode)
+if isstring(scoreMode)
+    scoreMode = char(scoreMode);
+end
+scoreMode = lower(strtrim(scoreMode));
+switch scoreMode
+    case 'summary'
+        metricMatrix = vertcat(records.metricsMean);
+    case 'mean'
+        if isfield(records, 'evalMeanMetrics') && ~isempty(records(1).evalMeanMetrics)
+            metricMatrix = vertcat(records.evalMeanMetrics);
+        else
+            metricMatrix = vertcat(records.metricsMean);
+        end
+    case 'upper'
+        if isfield(records, 'evalMeanMetrics') && ~isempty(records(1).evalMeanMetrics) ...
+                && isfield(records, 'evalStdMetrics') && ~isempty(records(1).evalStdMetrics)
+            metricMatrix = vertcat(records.evalMeanMetrics) + vertcat(records.evalStdMetrics);
+        else
+            metricMatrix = vertcat(records.metricsMean) + vertcat(records.metricsStd);
+        end
+    otherwise
+        error('run_biclr_grid_search:UnknownScoreMode', ...
+            '未知最优选择模式：%s。支持 summary、upper 或 mean。', scoreMode);
+end
 end
 
 function score = get_metric_column(metricMatrix, metricNames, metricName)
@@ -393,4 +574,12 @@ end
 
 function textValue = sanitize_numeric(value)
 textValue = regexprep(sprintf('%.6g', value), '[^0-9a-zA-Z]+', 'p');
+end
+
+function textValue = sanitize_optional_numeric(value)
+if isempty(value)
+    textValue = 'all';
+else
+    textValue = sanitize_numeric(value);
+end
 end

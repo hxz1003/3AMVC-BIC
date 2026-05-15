@@ -32,10 +32,33 @@ addpath(genpath(rootDir));
 U = eye(6);
 Y = [1; 1; 2; 2; 3; 3];
 evalOptions = struct('numRuns', 2, 'kmeansReplicates', 1, 'useParallel', false, 'baseSeed', 5);
-[meanMetric, stdMetric] = myNMIACCwithmean(U, Y, 3, evalOptions);
+[meanMetric, stdMetric, evalInfo] = myNMIACCwithmean(U, Y, 3, evalOptions);
 
 verifySize(testCase, meanMetric, [1, 8]);
 verifySize(testCase, stdMetric, [1, 8]);
 verifyGreaterThanOrEqual(testCase, meanMetric(1), 0);
 verifyLessThanOrEqual(testCase, meanMetric(1), 1);
+verifyEqual(testCase, evalInfo.summaryMode, 'mean');
+verifySize(testCase, evalInfo.allMetrics, [2, 8]);
+verifySize(testCase, evalInfo.minMetrics, [1, 8]);
+verifySize(testCase, evalInfo.maxMetrics, [1, 8]);
+verifyLessThanOrEqual(testCase, evalInfo.minMetrics(1), meanMetric(1));
+verifyGreaterThanOrEqual(testCase, evalInfo.maxMetrics(1), meanMetric(1));
+end
+
+function testMyNMIACCwithmeanBestACCMode(testCase)
+rootDir = fileparts(fileparts(mfilename('fullpath')));
+addpath(genpath(rootDir));
+
+U = eye(6);
+Y = [1; 1; 2; 2; 3; 3];
+evalOptions = struct('numRuns', 3, 'kmeansReplicates', 1, ...
+    'useParallel', false, 'baseSeed', 5, 'summaryMode', 'bestACC');
+[bestMetric, stdMetric, evalInfo] = myNMIACCwithmean(U, Y, 3, evalOptions);
+
+verifySize(testCase, bestMetric, [1, 8]);
+verifySize(testCase, stdMetric, [1, 8]);
+verifyEqual(testCase, evalInfo.summaryMode, 'bestacc');
+verifyEqual(testCase, bestMetric, evalInfo.bestRunMetrics, 'AbsTol', 1e-12);
+verifyEqual(testCase, bestMetric(1), max(evalInfo.allMetrics(:, 1)), 'AbsTol', 1e-12);
 end

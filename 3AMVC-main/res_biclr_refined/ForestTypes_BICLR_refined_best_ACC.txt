@@ -1,0 +1,81 @@
+BIC-LR 精细搜索最优 ACC 结果
+
+【一、按重复评价均值+标准差上界 ACC 最高】
+数据集：ForestTypes
+来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\ForestTypes_BICLR_grid_20260515_194739.mat
+选择准则：ACC
+选择口径：按重复评价均值+标准差上界
+beta=200
+lambda=1000
+lambdaBIC=0.75
+minNodeSize=24
+tauSplit=0
+epsVar=1e-08
+randomSeed=1
+numRuns=10
+kmeansReplicates=4
+evalSummaryMode=bestacc
+bestEvalRun=5
+bestEvalSeed=5
+anchorCounts=[17 17 16]
+targetView=3
+anchorQualityMethod=BICUnitEvidenceGain
+anchorEvidenceGain=[0.318451 0.290114 0.370197]
+重复评价均值±标准差：
+ACC=0.758509 ± 0.078924
+NMI=0.485882 ± 0.048084
+Purity=0.770172 ± 0.045983
+Fscore=0.627554 ± 0.051601
+重复评价逐指标范围：
+ACC=[0.529637, 0.818356]
+NMI=[0.368216, 0.553049]
+Purity=[0.646272, 0.818356]
+Fscore=[0.495234, 0.687797]
+选优汇总指标：
+summaryACC=0.818356
+summaryNMI=0.553049
+summaryPurity=0.818356
+summaryFscore=0.687797
+bestRun指标：ACC=0.818356，NMI=0.553049，Purity=0.818356，Fscore=0.687797
+总耗时=522.45s
+缓存键=ForestTypes_raw_view1_BICLR_lamBIC0p75_minNode24_tau0_eps1ep08_seed1_rmClutter0_capall, ForestTypes_raw_view2_BICLR_lamBIC0p75_minNode24_tau0_eps1ep08_seed1_rmClutter0_capall, ForestTypes_raw_view3_BICLR_lamBIC0p75_minNode24_tau0_eps1ep08_seed1_rmClutter0_capall
+
+【二、按重复评价平均 ACC 最高】
+数据集：ForestTypes
+来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\ForestTypes_BICLR_grid_20260515_194739.mat
+选择准则：ACC
+选择口径：按重复评价平均
+beta=100
+lambda=100
+lambdaBIC=0.75
+minNodeSize=20
+tauSplit=0
+epsVar=1e-08
+randomSeed=1
+numRuns=10
+kmeansReplicates=4
+evalSummaryMode=bestacc
+bestEvalRun=5
+bestEvalSeed=5
+anchorCounts=[20 19 20]
+targetView=3
+anchorQualityMethod=BICUnitEvidenceGain
+anchorEvidenceGain=[0.317957 0.291993 0.354903]
+重复评价均值±标准差：
+ACC=0.804015 ± 0.015516
+NMI=0.515392 ± 0.026646
+Purity=0.804015 ± 0.015516
+Fscore=0.674128 ± 0.018919
+重复评价逐指标范围：
+ACC=[0.774379, 0.820268]
+NMI=[0.465225, 0.541519]
+Purity=[0.774379, 0.820268]
+Fscore=[0.637944, 0.695053]
+选优汇总指标：
+summaryACC=0.820268
+summaryNMI=0.541519
+summaryPurity=0.820268
+summaryFscore=0.695053
+bestRun指标：ACC=0.820268，NMI=0.541519，Purity=0.820268，Fscore=0.695053
+总耗时=522.45s
+缓存键=ForestTypes_raw_view1_BICLR_lamBIC0p75_minNode20_tau0_eps1ep08_seed1_rmClutter0_capall, ForestTypes_raw_view2_BICLR_lamBIC0p75_minNode20_tau0_eps1ep08_seed1_rmClutter0_capall, ForestTypes_raw_view3_BICLR_lamBIC0p75_minNode20_tau0_eps1ep08_seed1_rmClutter0_capall

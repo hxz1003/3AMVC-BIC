@@ -1,21 +1,81 @@
 BIC-LR 精细搜索最优 ACC 结果
+
+【一、按重复评价均值+标准差上界 ACC 最高】
 数据集：Reuters-1200
-来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Reuters_1200_BICLR_grid_20260509_224753.mat
+来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Reuters_1200_BICLR_grid_20260512_184021.mat
 选择准则：ACC
-beta=50
-lambda=1000
-lambdaBIC=0.5
-minNodeSize=8
+选择口径：按重复评价均值+标准差上界
+beta=2000
+lambda=10000
+lambdaBIC=0.22
+minNodeSize=22
 tauSplit=0
 epsVar=1e-08
 randomSeed=1
 numRuns=8
 kmeansReplicates=4
-anchorCounts=[34 32 35 31 32]
-targetView=3
-ACC=0.599375 ± 0.030410
-NMI=0.347236 ± 0.012089
-Purity=0.604271 ± 0.019718
-Fscore=0.421125 ± 0.013702
-总耗时=642.08s
-缓存键=Reuters_1200_raw_view1_BICLR_lamBIC0p5_minNode8_seed1, Reuters_1200_raw_view2_BICLR_lamBIC0p5_minNode8_seed1, Reuters_1200_raw_view3_BICLR_lamBIC0p5_minNode8_seed1, Reuters_1200_raw_view4_BICLR_lamBIC0p5_minNode8_seed1, Reuters_1200_raw_view5_BICLR_lamBIC0p5_minNode8_seed1
+evalSummaryMode=bestacc
+bestEvalRun=1
+bestEvalSeed=1
+anchorCounts=[47 48 46 48 48]
+targetView=4
+anchorQualityMethod=BICUnitEvidenceGain
+anchorEvidenceGain=[0.0298597 0.0305339 0.0298907 0.0311631 0.0277496]
+重复评价均值±标准差：
+ACC=0.636458 ± 0.023224
+NMI=0.376245 ± 0.013310
+Purity=0.636458 ± 0.023224
+Fscore=0.451689 ± 0.020190
+重复评价逐指标范围：
+ACC=[0.580833, 0.655000]
+NMI=[0.349863, 0.390303]
+Purity=[0.580833, 0.655000]
+Fscore=[0.408269, 0.469917]
+选优汇总指标：
+summaryACC=0.655000
+summaryNMI=0.390303
+summaryPurity=0.655000
+summaryFscore=0.469813
+bestRun指标：ACC=0.655000，NMI=0.390303，Purity=0.655000，Fscore=0.469813
+总耗时=366.81s
+缓存键=Reuters_1200_raw_view1_BICLR_lamBIC0p22_minNode22_seed1, Reuters_1200_raw_view2_BICLR_lamBIC0p22_minNode22_seed1, Reuters_1200_raw_view3_BICLR_lamBIC0p22_minNode22_seed1, Reuters_1200_raw_view4_BICLR_lamBIC0p22_minNode22_seed1, Reuters_1200_raw_view5_BICLR_lamBIC0p22_minNode22_seed1
+
+【二、按重复评价平均 ACC 最高】
+数据集：Reuters-1200
+来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Reuters_1200_BICLR_grid_20260512_184021.mat
+选择准则：ACC
+选择口径：按重复评价平均
+beta=2000
+lambda=1000
+lambdaBIC=0.22
+minNodeSize=22
+tauSplit=0
+epsVar=1e-08
+randomSeed=1
+numRuns=8
+kmeansReplicates=4
+evalSummaryMode=bestacc
+bestEvalRun=2
+bestEvalSeed=2
+anchorCounts=[47 48 46 48 48]
+targetView=4
+anchorQualityMethod=BICUnitEvidenceGain
+anchorEvidenceGain=[0.0298597 0.0305339 0.0298907 0.0311631 0.0277496]
+重复评价均值±标准差：
+ACC=0.637083 ± 0.005069
+NMI=0.372111 ± 0.004383
+Purity=0.637083 ± 0.005069
+Fscore=0.450353 ± 0.005687
+重复评价逐指标范围：
+ACC=[0.627500, 0.645000]
+NMI=[0.363085, 0.378857]
+Purity=[0.627500, 0.645000]
+Fscore=[0.441562, 0.459050]
+选优汇总指标：
+summaryACC=0.645000
+summaryNMI=0.378857
+summaryPurity=0.645000
+summaryFscore=0.459050
+bestRun指标：ACC=0.645000，NMI=0.378857，Purity=0.645000，Fscore=0.459050
+总耗时=366.81s
+缓存键=Reuters_1200_raw_view1_BICLR_lamBIC0p22_minNode22_seed1, Reuters_1200_raw_view2_BICLR_lamBIC0p22_minNode22_seed1, Reuters_1200_raw_view3_BICLR_lamBIC0p22_minNode22_seed1, Reuters_1200_raw_view4_BICLR_lamBIC0p22_minNode22_seed1, Reuters_1200_raw_view5_BICLR_lamBIC0p22_minNode22_seed1

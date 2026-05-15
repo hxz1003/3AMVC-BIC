@@ -94,8 +94,14 @@ for d = 1:numel(datasetNames)
     numRecords = numel(records);
     acc = arrayfun(@(s) s.metricsMean(1), records);
     nmi = arrayfun(@(s) s.metricsMean(2), records);
-    purity = arrayfun(@(s) s.metricsMean(3), records);
-    fscore = arrayfun(@(s) s.metricsMean(4), records);
+    accMean = arrayfun(@(s) get_eval_mean_metric(s, 1), records);
+    nmiMean = arrayfun(@(s) get_eval_mean_metric(s, 2), records);
+    purityMean = arrayfun(@(s) get_eval_mean_metric(s, 3), records);
+    fscoreMean = arrayfun(@(s) get_eval_mean_metric(s, 4), records);
+    accStd = arrayfun(@(s) get_eval_std_metric(s, 1), records);
+    nmiStd = arrayfun(@(s) get_eval_std_metric(s, 2), records);
+    purityStd = arrayfun(@(s) get_eval_std_metric(s, 3), records);
+    fscoreStd = arrayfun(@(s) get_eval_std_metric(s, 4), records);
     beta = arrayfun(@(s) s.beta, records);
     lambda = arrayfun(@(s) s.lambda, records);
     lambdaBIC = arrayfun(@(s) s.lambdaBIC, records);
@@ -109,8 +115,15 @@ for d = 1:numel(datasetNames)
 
     acc = acc(:);
     nmi = nmi(:);
-    purity = purity(:);
-    fscore = fscore(:);
+    accMean = accMean(:);
+    nmiMean = nmiMean(:);
+    purityMean = purityMean(:);
+    fscoreMean = fscoreMean(:);
+    accStd = accStd(:);
+    nmiStd = nmiStd(:);
+    purityStd = purityStd(:);
+    fscoreStd = fscoreStd(:);
+    accUpper = accMean + accStd;
     beta = beta(:);
     lambda = lambda(:);
     lambdaBIC = lambdaBIC(:);
@@ -125,18 +138,25 @@ for d = 1:numel(datasetNames)
     rawDatasetTable = table( ...
         repmat(string(datasetName), numRecords, 1), ...
         beta, lambda, lambdaBIC, minNodeSize, ...
-        acc, nmi, purity, fscore, anchorTotal, targetView, iter, algoTime, anchorTime, totalTime, ...
+        accMean, accStd, nmiMean, nmiStd, purityMean, purityStd, fscoreMean, fscoreStd, acc, ...
+        anchorTotal, targetView, iter, algoTime, anchorTime, totalTime, ...
         'VariableNames', {'dataset', 'beta', 'lambda', 'lambdaBIC', 'minNodeSize', ...
-        'ACC', 'NMI', 'Purity', 'Fscore', 'anchorTotal', 'targetView', 'iter', 'algoTime', 'anchorTime', 'totalTime'});
+        'ACC', 'ACCStd', 'NMI', 'NMIStd', 'Purity', 'PurityStd', 'Fscore', 'FscoreStd', ...
+        'summaryACC', 'anchorTotal', 'targetView', 'iter', 'algoTime', 'anchorTime', 'totalTime'});
 
     rawTablePath = fullfile(outputDir, sprintf('%s_raw_results.csv', sanitize_key(datasetName)));
     writetable(rawDatasetTable, rawTablePath);
 
     [accSorted, accOrder] = sort(acc, 'descend');
+    [~, accUpperOrder] = sort(accUpper, 'descend');
+    [~, accMeanOrder] = sort(accMean, 'descend');
     topK = min(5, numel(accOrder));
     for k = 1:topK
         s = records(accOrder(k));
-        topRows(end + 1, :) = {datasetName, k, s.metricsMean(1), s.metricsMean(2), s.metricsMean(3), s.metricsMean(4), ... %#ok<AGROW>
+        topRows(end + 1, :) = {datasetName, k, get_eval_mean_metric(s, 1), get_eval_std_metric(s, 1), ...
+            get_eval_mean_metric(s, 2), get_eval_std_metric(s, 2), ...
+            get_eval_mean_metric(s, 3), get_eval_std_metric(s, 3), ...
+            get_eval_mean_metric(s, 4), get_eval_std_metric(s, 4), s.metricsMean(1), ... %#ok<AGROW>
             s.beta, s.lambda, s.lambdaBIC, s.minNodeSize, sum(s.anchorCounts), mat2str(s.anchorCounts')};
     end
 
@@ -180,11 +200,18 @@ for d = 1:numel(datasetNames)
 
     [sortedRange, sortedIdx] = sort(rangeRows, 'descend');
     summaryLines{end + 1} = sprintf('数据集 %s：使用文件 %s（%d 组参数）。', datasetName, chosen.fileName, chosen.records); %#ok<AGROW>
-    summaryLines{end + 1} = sprintf(['最优 ACC=%.4f，对应 beta=%g, lambda=%g, lambdaBIC=%g, minNodeSize=%d，' ...
-        '总锚点数=%d，NMI=%.4f。'], ...
-        records(accOrder(1)).metricsMean(1), records(accOrder(1)).beta, records(accOrder(1)).lambda, ...
-        records(accOrder(1)).lambdaBIC, records(accOrder(1)).minNodeSize, sum(records(accOrder(1)).anchorCounts), ...
-        records(accOrder(1)).metricsMean(2)); %#ok<AGROW>
+    bestUpperRecord = records(accUpperOrder(1));
+    summaryLines{end + 1} = sprintf(['按 ACC 均值+标准差最高：ACC=%.4f±%.4f（summaryACC=%.4f），对应 beta=%g, lambda=%g, ' ...
+        'lambdaBIC=%g, minNodeSize=%d，总锚点数=%d，NMI=%.4f±%.4f。'], ...
+        get_eval_mean_metric(bestUpperRecord, 1), get_eval_std_metric(bestUpperRecord, 1), bestUpperRecord.metricsMean(1), ...
+        bestUpperRecord.beta, bestUpperRecord.lambda, bestUpperRecord.lambdaBIC, bestUpperRecord.minNodeSize, ...
+        sum(bestUpperRecord.anchorCounts), get_eval_mean_metric(bestUpperRecord, 2), get_eval_std_metric(bestUpperRecord, 2)); %#ok<AGROW>
+    bestMeanRecord = records(accMeanOrder(1));
+    summaryLines{end + 1} = sprintf(['按重复评价平均 ACC 最高：ACC=%.4f±%.4f（summaryACC=%.4f），对应 beta=%g, lambda=%g, ' ...
+        'lambdaBIC=%g, minNodeSize=%d，总锚点数=%d，NMI=%.4f±%.4f。'], ...
+        get_eval_mean_metric(bestMeanRecord, 1), get_eval_std_metric(bestMeanRecord, 1), bestMeanRecord.metricsMean(1), ...
+        bestMeanRecord.beta, bestMeanRecord.lambda, bestMeanRecord.lambdaBIC, bestMeanRecord.minNodeSize, ...
+        sum(bestMeanRecord.anchorCounts), get_eval_mean_metric(bestMeanRecord, 2), get_eval_std_metric(bestMeanRecord, 2)); %#ok<AGROW>
     summaryLines{end + 1} = sprintf(['95%% 最优 ACC 区间内共有 %d/%d 组参数；' ...
         'beta 候选=%s，lambda 候选=%s，lambdaBIC 候选=%s，minNodeSize 候选=%s。'], ...
         sum(nearOptMask), numRecords, mat2str(nearBeta(:)'), mat2str(nearLambda(:)'), ...
@@ -200,7 +227,8 @@ end
 selectedFilesTable = cell2table(selectedRows, 'VariableNames', {'dataset', 'selectedFile', 'numRecords'});
 marginalTable = cell2table(marginalRows, 'VariableNames', {'dataset', 'parameter', 'level', 'meanACC', 'stdACC', ...
     'maxACC', 'meanNMI', 'meanAnchorTotal', 'minAnchorTotal', 'maxAnchorTotal', 'nearOptimalRatio'});
-topConfigTable = cell2table(topRows, 'VariableNames', {'dataset', 'rank', 'ACC', 'NMI', 'Purity', 'Fscore', ...
+topConfigTable = cell2table(topRows, 'VariableNames', {'dataset', 'rank', 'ACC', 'ACCStd', 'NMI', 'NMIStd', ...
+    'Purity', 'PurityStd', 'Fscore', 'FscoreStd', 'summaryACC', ...
     'beta', 'lambda', 'lambdaBIC', 'minNodeSize', 'anchorTotal', 'anchorCountByView'});
 
 rawCombinedTable = collect_all_raw_tables(outputDir);
@@ -215,7 +243,7 @@ fid = fopen(summaryPath, 'w');
 if fid < 0
     error('analyze_biclr_sensitivity:WriteFailed', '无法写入摘要文件：%s', summaryPath);
 end
-cleanupObj = onCleanup(@() fclose(fid)); %#ok<NASGU>
+cleanupObj = onCleanup(@() fclose(fid));
 fprintf(fid, 'BIC-LR 超参数敏感度分析摘要\n');
 fprintf(fid, '分析时间：%s\n\n', char(datetime('now'))); 
 for i = 1:numel(summaryLines)
@@ -252,6 +280,22 @@ switch paramName
         error('analyze_biclr_sensitivity:UnknownParam', '未知参数名：%s', paramName);
 end
 values = values(:);
+end
+
+function value = get_eval_mean_metric(record, metricIndex)
+if isfield(record, 'evalMeanMetrics') && numel(record.evalMeanMetrics) >= metricIndex
+    value = record.evalMeanMetrics(metricIndex);
+else
+    value = record.metricsMean(metricIndex);
+end
+end
+
+function value = get_eval_std_metric(record, metricIndex)
+if isfield(record, 'evalStdMetrics') && numel(record.evalStdMetrics) >= metricIndex
+    value = record.evalStdMetrics(metricIndex);
+else
+    value = record.metricsStd(metricIndex);
+end
 end
 
 function key = sanitize_key(textValue)

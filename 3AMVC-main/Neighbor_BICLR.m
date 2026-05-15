@@ -16,7 +16,7 @@ function [res_neighbor, time_neighbor, label_neighbor, object, theta, class, inf
 %   object         : m*1 向量，每个锚点的簇内平方误差。
 %   theta          : m*d 矩阵，每行为一个锚点中心。
 %   class          : 最终锚点数量。
-%   info           : 结构体，附带锚点质量、总 SSE 和配置参数。
+%   info           : 结构体，附带 BIC 证据校准质量、总 SSE 和配置参数。
 %
 %   See also BIC_LR_HBNC, Neighbor
 
@@ -44,7 +44,15 @@ else
     res_neighbor = Clustering8Measure(Y, label_neighbor);
 end
 
-info.qualityScore = sum(object);
+if ~isfield(info, 'viewEvidence') || ~isfield(info.viewEvidence, 'qualityScore')
+    info.viewEvidence = biclr_view_evidence(X0, object, info.anchorSizes, info.options);
+end
+info.legacySSEQuality = info.totalSSE;
+info.qualityMethod = 'BICUnitEvidenceGain';
+info.qualityScore = info.viewEvidence.qualityScore;
+info.unitBICEvidence = info.viewEvidence.unitGain;
+info.relativeBICEvidence = info.viewEvidence.unitGain;
+info.bicEvidenceGain = info.viewEvidence.deltaBIC;
 info.timeNeighbor = time_neighbor;
 end
 

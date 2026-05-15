@@ -1,6 +1,31 @@
-function [label,object,theta,num_class,class] = Impro_HBNC(X0,label_pre,object_pre)
-flag = 1;
+function [label,object,theta,num_class,class] = Impro_HBNC(X0,label_pre,~)
+%IMPRO_HBNC 原始 HBNC 路径的迭代改进阶段。
+%   [LABEL, OBJECT, THETA, NUM_CLASS, CLASS] = IMPRO_HBNC(X0, LABEL_PRE, OBJECT_PRE)
+%   在 Pre_HBNC 的预划分结果上处理离群点并继续按原始 HBNC 判据细分高 SSE 节点。
+%
+%   输入参数：
+%   X0        : n*d 的单视图特征矩阵。
+%   label_pre : n*1 的预划分标签，要求为正整数。
+%   object_pre: 预划分阶段的节点 SSE，仅为兼容原始接口保留。
+%
+%   输出参数：
+%   label     : n*1 的最终锚点标签。
+%   object    : class*1 的每个锚点 SSE。
+%   theta     : class*d 的锚点中心。
+%   num_class : class*1 的每个锚点样本数。
+%   class     : 最终锚点数量。
+
+validateattributes(X0, {'double', 'single'}, {'2d', 'nonempty', 'real'}, mfilename, 'X0', 1);
+validateattributes(label_pre, {'double', 'single'}, {'vector', 'nonempty', 'real', 'integer', 'positive'}, mfilename, 'label_pre', 2);
+if any(~isfinite(X0(:))) || any(~isfinite(label_pre(:)))
+    error('Impro_HBNC:InvalidInput', 'X0 或 label_pre 含有 NaN 或 Inf。');
+end
 n = size(X0,1);
+label_pre = label_pre(:);
+if numel(label_pre) ~= n
+    error('Impro_HBNC:SizeMismatch', 'label_pre 的长度必须等于 X0 的样本数。');
+end
+flag = 1;
 iter = 1;
 % Process Outliers
 [label,theta,num_class,class] = Pro_Out(X0,label_pre);
@@ -20,7 +45,7 @@ while flag
     end
     
    % find target range 
-   [object_max,class_max] = max(object);
+   [~,class_max] = max(object);
     target_range_label = label == class_max;
 
     % Randomly select a target sample in the target range
@@ -59,8 +84,6 @@ while flag
     target_label = target_range_label;
     target_label_loc = find(target_range_label==1);
     target_label(target_label_loc(target_class_label==0)) = 0;
-    target_label_other = target_range_label & ~target_label;
-    
     if sum(target_class_label) < sum(target_range_label)
         % Update label
         class = class + 1;
@@ -97,16 +120,25 @@ while flag
     
     % Convergence conditions
     [object_max,class_max] = max(object);
-    object_othersMean = mean(object(object~=object_max));
-    Obj(iter,:) = (object_max-object_othersMean)/object_othersMean;
+    otherObject = object;
+    otherObject(class_max) = [];
+    if isempty(otherObject)
+        flag = 0;
+        continue;
+    end
+    object_othersMean = mean(otherObject);
+    relativeObjectGap = (object_max-object_othersMean) / max(object_othersMean, eps);
+    Obj(iter,:) = relativeObjectGap;
     iter = iter + 1 ;
+    % 原始 HBNC 规则：最大 SSE 簇小于总样本 2% 时停止，避免细分极小簇。
     if sum(label==class_max)<n/50
         flag = 0;
     end
     if sum(num_class==1)>=1
         flag = 0;
     end
-    if (object_max-object_othersMean)/object_othersMean <= 0.5
+    % 原始 HBNC 规则：最大 SSE 与其他簇平均 SSE 的相对差距不超过 0.5 时停止。
+    if relativeObjectGap <= 0.5
         flag = 0;
     end 
     

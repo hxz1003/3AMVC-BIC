@@ -115,7 +115,7 @@ W1 = max(real(W1), 0);
 W2 = max(real(W2), 0);
 
 logL1All = biclr_loglik_double(n1, n2, d, W1, W2, options.epsVar);
-penalty = options.lambdaBIC * (d + 1) * log(max(n, 2));
+penalty = options.lambdaBIC * (d + 1) * log(n);
 scoreAll = 2 * (logL1All - logL0) - penalty;
 [bestScore, bestLoc] = max(scoreAll);
 

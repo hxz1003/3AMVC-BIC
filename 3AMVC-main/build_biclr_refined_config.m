@@ -27,6 +27,8 @@ validateattributes(randomSeed, {'double', 'single'}, {'scalar', 'integer', 'nonn
 
 rootDir = fileparts(mfilename('fullpath'));
 config = struct();
+preprocessTag = 'raw';
+maxPerClass = [];
 
 switch lower(datasetName)
     case 'mfeat_2views'
@@ -65,6 +67,25 @@ switch lower(datasetName)
         numRuns = 8;
         kmeansReplicates = 4;
         removeClutter = false;
+    case 'foresttypes'
+        config.betaList = [80 100 120 160 200];
+        config.lambdaList = [10 30 100 300 1000];
+        config.lambdaBICList = [0.2 0.35 0.5 0.75 1];
+        config.minNodeSizeList = [16 20 24 28 32];
+        maxAnchors = 200;
+        numRuns = 10;
+        kmeansReplicates = 4;
+        removeClutter = false;
+    case 'caltech256_4views_257cls_withclutter'
+        config.betaList = [80 100 150 200];
+        config.lambdaList = [5e2 1e3 3e3 1e4];
+        config.lambdaBICList = [3 4 5 6];
+        config.minNodeSizeList = [40 60 80 120];
+        maxAnchors = 600;
+        numRuns = 3;
+        kmeansReplicates = 1;
+        removeClutter = false;
+        preprocessTag = 'raw_withClutter_257cls_ordered';
     otherwise
         error('build_biclr_refined_config:UnsupportedDataset', '未为数据集 %s 预设精细搜索网格。', datasetName);
 end
@@ -80,13 +101,15 @@ config.evalOptions = struct( ...
     'numRuns', numRuns, ...
     'kmeansReplicates', kmeansReplicates, ...
     'useParallel', false, ...
-    'baseSeed', randomSeed);
+    'baseSeed', randomSeed, ...
+    'summaryMode', 'bestACC');
 
-config.preprocessTag = 'raw';
+config.preprocessTag = preprocessTag;
 config.useCache = true;
 config.verbose = true;
 config.verboseAnchors = false;
 config.removeClutter = removeClutter;
+config.maxPerClass = maxPerClass;
 config.selectionMetricName = 'ACC';
 config.storeDetailedModel = false;
 config.saveDir = fullfile(rootDir, 'res_biclr_refined');

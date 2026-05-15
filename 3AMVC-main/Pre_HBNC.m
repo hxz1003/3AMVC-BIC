@@ -1,7 +1,30 @@
-function [label,object,theta,num_class,class] = Pre_HBNC(X0)
+function [label, object, theta, num_class, class] = Pre_HBNC(X0, options)
+%PRE_HBNC 原始 HBNC 路径的预划分阶段。
+%   [LABEL, OBJECT, THETA, NUM_CLASS, CLASS] = PRE_HBNC(X0) 使用固定默认
+%   随机种子选择初始目标样本，以保证原始 HBNC 路径可复现。
+%
+%   [...] = PRE_HBNC(X0, OPTIONS) 支持 OPTIONS.randomSeed。若将
+%   randomSeed 设为空，则沿用当前 MATLAB 随机状态。
+
+if nargin < 2
+    options = struct();
+end
+validateattributes(X0, {'double', 'single'}, {'2d', 'nonempty', 'real'}, mfilename, 'X0', 1);
+if any(~isfinite(X0(:)))
+    error('Pre_HBNC:InvalidData', 'X0 含有 NaN 或 Inf，请先检查数据。');
+end
+if ~isfield(options, 'randomSeed')
+    options.randomSeed = 1;
+end
+
 flag = 1;
 n = size(X0,1);
 label = zeros(n,1);
+if ~isempty(options.randomSeed)
+    rngState = rng;
+    cleanupObj = onCleanup(@() rng(rngState));
+    rng(options.randomSeed, 'twister');
+end
 target = randi([1 n]);
 target_range_label = ones(n,1);
 target_range_label = target_range_label > 0;
@@ -23,6 +46,7 @@ while flag
     target_label_other = target_range_label & ~target_label;
     
         % Update class label
+    % 原始 HBNC 仅当剩余样本超过 5 个时继续保留待分裂区域，避免极小尾部簇反复生成。
     if sum(target_label_other)>5
         label(target_label) = class;
         theta(class,:) = mean(X0(target_label,:),1);

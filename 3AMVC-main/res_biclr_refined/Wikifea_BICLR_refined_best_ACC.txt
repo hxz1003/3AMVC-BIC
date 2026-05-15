@@ -1,21 +1,81 @@
 BIC-LR 精细搜索最优 ACC 结果
+
+【一、按重复评价均值+标准差上界 ACC 最高】
 数据集：Wikifea
-来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Wikifea_BICLR_grid_20260509_225718.mat
+来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Wikifea_BICLR_grid_20260512_150444.mat
 选择准则：ACC
-beta=80
-lambda=100
-lambdaBIC=3
-minNodeSize=40
+选择口径：按重复评价均值+标准差上界
+beta=120
+lambda=10000
+lambdaBIC=4.5
+minNodeSize=30
 tauSplit=0
 epsVar=1e-08
 randomSeed=1
 numRuns=8
 kmeansReplicates=4
-anchorCounts=[21 43]
-targetView=1
-ACC=0.567385 ± 0.000947
-NMI=0.517829 ± 0.000770
-Purity=0.605940 ± 0.001269
-Fscore=0.479296 ± 0.001302
-总耗时=1256.18s
-缓存键=Wikifea_raw_view1_BICLR_lamBIC3_minNode40_seed1, Wikifea_raw_view2_BICLR_lamBIC3_minNode40_seed1
+evalSummaryMode=bestacc
+bestEvalRun=1
+bestEvalSeed=1
+anchorCounts=[15 35]
+targetView=2
+anchorQualityMethod=BICUnitEvidenceGain
+anchorEvidenceGain=[0.130309 0.476596]
+重复评价均值±标准差：
+ACC=0.556219 ± 0.022481
+NMI=0.505405 ± 0.006047
+Purity=0.600183 ± 0.012052
+Fscore=0.436150 ± 0.017708
+重复评价逐指标范围：
+ACC=[0.512212, 0.581996]
+NMI=[0.494205, 0.513267]
+Purity=[0.586532, 0.621424]
+Fscore=[0.411577, 0.475074]
+选优汇总指标：
+summaryACC=0.581996
+summaryNMI=0.513267
+summaryPurity=0.621424
+summaryFscore=0.475074
+bestRun指标：ACC=0.581996，NMI=0.513267，Purity=0.621424，Fscore=0.475074
+总耗时=420.47s
+缓存键=Wikifea_raw_view1_BICLR_lamBIC4p5_minNode30_seed1, Wikifea_raw_view2_BICLR_lamBIC4p5_minNode30_seed1
+
+【二、按重复评价平均 ACC 最高】
+数据集：Wikifea
+来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Wikifea_BICLR_grid_20260512_150444.mat
+选择准则：ACC
+选择口径：按重复评价平均
+beta=100
+lambda=10000
+lambdaBIC=4.5
+minNodeSize=30
+tauSplit=0
+epsVar=1e-08
+randomSeed=1
+numRuns=8
+kmeansReplicates=4
+evalSummaryMode=bestacc
+bestEvalRun=7
+bestEvalSeed=7
+anchorCounts=[15 35]
+targetView=2
+anchorQualityMethod=BICUnitEvidenceGain
+anchorEvidenceGain=[0.130309 0.476596]
+重复评价均值±标准差：
+ACC=0.557877 ± 0.013195
+NMI=0.520398 ± 0.009936
+Purity=0.616321 ± 0.010057
+Fscore=0.451136 ± 0.011111
+重复评价逐指标范围：
+ACC=[0.534543, 0.575017]
+NMI=[0.495721, 0.527745]
+Purity=[0.593859, 0.627355]
+Fscore=[0.425285, 0.460650]
+选优汇总指标：
+summaryACC=0.575017
+summaryNMI=0.527745
+summaryPurity=0.623866
+summaryFscore=0.460650
+bestRun指标：ACC=0.575017，NMI=0.527745，Purity=0.623866，Fscore=0.460650
+总耗时=420.47s
+缓存键=Wikifea_raw_view1_BICLR_lamBIC4p5_minNode30_seed1, Wikifea_raw_view2_BICLR_lamBIC4p5_minNode30_seed1

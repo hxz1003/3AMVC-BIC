@@ -21,7 +21,7 @@ function [label, object, theta, num_class, class, info] = BIC_LR_HBNC(X0, option
 %   theta     : m*d 矩阵，每行为一个锚点中心。
 %   num_class : m*1 向量，每个锚点节点包含的样本数。
 %   class     : 标量，最终锚点数量 m。
-%   info      : 结构体，记录锚点数量、深度、停止原因和配置参数。
+%   info      : 结构体，记录锚点数量、深度、停止原因、BIC 证据质量和配置参数。
 %
 %   维度说明：
 %   n 为样本数，d 为特征维度，m 为最终生成的锚点数。
@@ -138,6 +138,7 @@ info.numAnchors = class;
 info.anchorSizes = num_class;
 info.anchorSSE = object;
 info.totalSSE = sum(object);
+info.legacySSEQuality = info.totalSSE;
 info.acceptedSplits = acceptedSplits;
 info.rejectedSplits = rejectedSplits;
 info.maxDepth = maxDepth;
@@ -145,6 +146,12 @@ info.leafDepths = leafDepths;
 info.leafScores = leafScores;
 info.stopReasons = leafReasons;
 info.options = options;
+info.viewEvidence = biclr_view_evidence(X0, object, num_class, options);
+info.qualityMethod = 'BICUnitEvidenceGain';
+info.qualityScore = info.viewEvidence.qualityScore;
+info.unitBICEvidence = info.viewEvidence.unitGain;
+info.relativeBICEvidence = info.viewEvidence.unitGain;
+info.bicEvidenceGain = info.viewEvidence.deltaBIC;
 end
 
 function options = fill_default_options(options, n)
