@@ -148,8 +148,8 @@ resultSummary.selectedConfig = build_selected_config(resultSummary);
 resultSummary.totalTime = toc(globalTimer);
 resultSummary.numGridConfigs = numGridConfigs;
 resultSummary.searchBudget = searchBudget;
+allResults(bestIndex).selectedConfig = resultSummary.selectedConfig;
 resultSummary.resultSavePath = save_ablation_result(allResults, resultSummary, config, methodConfig, datasetInfo, paths);
-allResults(bestIndex).selectedConfig = resultSummary.selectedConfig; %#ok<NASGU>
 
 fprintf('[消融] 最优配置：\n');
 disp(resultSummary.selectedConfig);

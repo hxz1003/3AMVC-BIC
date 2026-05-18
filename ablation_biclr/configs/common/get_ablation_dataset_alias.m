@@ -46,17 +46,29 @@ switch key
         datasetInfo.resultDirName = 'WIKI';
         datasetInfo.displayName = 'WIKI';
         datasetInfo.possibleFileNames = {'Wikifea.mat', 'WIKI.mat', 'Wiki.mat', 'wiki.mat'};
-    case {'catlch101all', 'caltech101all', 'caltech101', 'caltech101all'}
+    case {'catlch101all', 'caltech101all', 'caltech101'}
         datasetInfo.canonicalName = 'Caltech101-all';
         datasetInfo.resultDirName = 'Catlch101All';
         datasetInfo.displayName = 'Catlch101All';
         datasetInfo.possibleFileNames = {'Caltech101-all.mat', 'Caltech101_all.mat', ...
             'Catlch101All.mat', 'Caltech101.mat'};
+    case {'foresttypes', 'foresttype', 'forest'}
+        datasetInfo.canonicalName = 'ForestTypes';
+        datasetInfo.resultDirName = 'ForestTypes';
+        datasetInfo.displayName = 'ForestTypes';
+        datasetInfo.possibleFileNames = {'ForestTypes.mat', 'ForestType.mat', 'foresttypes.mat'};
+    case {'caltech2564views257clswithclutter', 'caltech256withclutter', 'caltech256'}
+        datasetInfo.canonicalName = 'Caltech256_4Views_257cls_withClutter';
+        datasetInfo.resultDirName = 'Caltech256_4Views_257cls_withClutter';
+        datasetInfo.displayName = 'Caltech256_4Views_257cls_withClutter';
+        datasetInfo.possibleFileNames = {'Caltech256_4Views_257cls_withClutter.mat', ...
+            'Caltech256.mat', 'Caltech256_withClutter.mat'};
     otherwise
         error('get_ablation_dataset_alias:UnsupportedDataset', ...
             ['不支持的数据集别名：%s。\n支持：Mfeat/MFeat/mfeat，Ruter-1200/Ruter1200/' ...
              'Reuters-1200/Reuters1200/Reuters，WIKI/Wiki/wiki，catlch101 all/' ...
-             'Catlch101All/Caltech101-all/Caltech101_all/Caltech101。'], datasetName);
+             'Catlch101All/Caltech101-all/Caltech101_all/Caltech101，ForestTypes/Forest，' ...
+             'Caltech256_4Views_257cls_withClutter/Caltech256。'], datasetName);
 end
 
 datasetInfo.dataFile = locate_dataset_file(datasetInfo);

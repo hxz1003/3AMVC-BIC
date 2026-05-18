@@ -12,7 +12,8 @@ function summaryTables = summarize_ablation_results()
 paths = get_project_paths();
 methods = {'A0_Full_Reference', 'A1_woBIC_Joint', 'A3_SSETarget', 'A4_woMultiViewFusion'};
 methodLabels = {'A0 Reference', 'A1 w/o BIC', 'A3 SSE Target', 'A4 Single View'};
-datasets = {'Mfeat', 'Ruter1200', 'WIKI', 'Catlch101All'};
+datasets = {'Mfeat', 'Ruter1200', 'WIKI', 'Catlch101All', ...
+    'ForestTypes', 'Caltech256_4Views_257cls_withClutter'};
 
 mainRows = {};
 mechanismRows = {};

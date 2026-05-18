@@ -144,7 +144,6 @@ end
 end
 
 function [resultSummary, allResults] = convert_loaded_a0_result(loaded, datasetInfo, config, paths, sourcePath)
-source = [];
 allResults = [];
 if isfield(loaded, 'results')
     source = loaded.results;

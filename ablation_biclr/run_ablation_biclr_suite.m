@@ -11,8 +11,8 @@ function summaries = run_ablation_biclr_suite(options)
 %   enableLargeDataset : 是否允许 Catlch101All 使用完整网格。
 %
 %   注意事项：
-%   默认不自动运行 Catlch101All 的完整大网格；若未指定 datasetName，
-%   默认只批量运行 Mfeat、Ruter1200、WIKI。
+%   默认不自动运行 Catlch101All 和 Caltech256 的完整大网格；若未指定
+%   datasetName，默认批量运行 Mfeat、Ruter1200、WIKI、ForestTypes。
 
 if nargin < 1 || isempty(options)
     options = struct();
@@ -43,9 +43,10 @@ end
 if isfield(options, 'datasetName') && ~isempty(options.datasetName)
     datasets = {char(options.datasetName)};
 else
-    datasets = {'Mfeat', 'Ruter1200', 'WIKI'};
+    datasets = {'Mfeat', 'Ruter1200', 'WIKI', 'ForestTypes'};
     if options.enableLargeDataset
         datasets{end + 1} = 'Catlch101All';
+        datasets{end + 1} = 'Caltech256_4Views_257cls_withClutter';
     end
 end
 

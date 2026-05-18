@@ -45,7 +45,8 @@ config.evalOptions.baseSeed = config.seeds(1);
 config.evalOptions.useParallel = config.useParallel;
 config.evalOptions.summaryMode = config.summaryMode;
 
-if strcmp(datasetInfo.resultDirName, 'Catlch101All') && ~config.enableLargeDataset
+largeDatasetNames = {'Catlch101All'};
+if any(strcmp(datasetInfo.resultDirName, largeDatasetNames)) && ~config.enableLargeDataset
     config.fullGridWhenLargeDatasetEnabled = grid;
     config.betaList = first_value(grid.betaList);
     config.lambdaList = first_value(grid.lambdaList);
@@ -137,6 +138,23 @@ switch lower(canonicalName)
         grid.maxAnchors = 500;
         grid.numRuns = 6;
         grid.kmeansReplicates = 3;
+    case 'foresttypes'
+        grid.betaList = [80 100 120 160 200];
+        grid.lambdaList = [10 30 100 300 1000];
+        grid.lambdaBICList = [0.2 0.35 0.5 0.75 1];
+        grid.minNodeSizeList = [16 20 24 28 32];
+        grid.maxAnchors = 200;
+        grid.numRuns = 10;
+        grid.kmeansReplicates = 4;
+    case 'caltech256_4views_257cls_withclutter'
+        grid.betaList = [80 100 150 200];
+        grid.lambdaList = [5e2 1e3 3e3 1e4];
+        grid.lambdaBICList = [3 4 5 6];
+        grid.minNodeSizeList = [40 60 80 120];
+        grid.maxAnchors = 600;
+        grid.numRuns = 3;
+        grid.kmeansReplicates = 3;
+        grid.preprocessTag = 'raw_withClutter_257cls_ordered';
     otherwise
         error('get_dataset_grid_config:UnsupportedDataset', ...
             '未为数据集 %s 设置默认网格。', canonicalName);
