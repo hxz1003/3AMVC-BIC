@@ -1,0 +1,952 @@
+\documentclass[UTF8,a4paper,12pt,fontset=none]{ctexart}
+
+\usepackage{amsmath,amssymb,amsfonts,bm}
+\usepackage{booktabs,longtable,array}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{mathtools}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{caption}
+
+\geometry{left=1in,right=1in,top=1in,bottom=1in}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!50!black,
+  urlcolor=blue!50!black,
+  citecolor=blue!50!black
+}
+
+\setCJKmainfont[
+  Path={C:/Windows/Fonts/},
+  AutoFakeBold=2.0,
+  AutoFakeSlant=0.18
+]{NotoSerifSC-VF.ttf}
+\setCJKsansfont[
+  Path={C:/Windows/Fonts/},
+  AutoFakeBold=2.0,
+  AutoFakeSlant=0.18
+]{NotoSansSC-VF.ttf}
+\setCJKmonofont[
+  Path={C:/Windows/Fonts/},
+  AutoFakeBold=2.0
+]{simhei.ttf}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\tr}{\operatorname{Tr}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+\newcommand{\epsv}{\varepsilon}
+\newcommand{\BIC}{\mathrm{BIC}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\one}{\mathbf{1}}
+\newcommand{\T}{\mathsf{T}}
+\DeclareMathOperator{\rank}{rank}
+
+\captionsetup{font=small}
+\setlist{nosep}
+\allowdisplaybreaks
+
+\title{\textbf{Proposed Method}\\
+\large 基于 BIC 正则化似然比锚点选择的锚点图多视图聚类}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{问题定义}
+
+设共有 \(n\) 个待聚类样本、\(V\) 个视图以及 \(c\) 个聚类。第 \(v\) 个视图的原始数据矩阵记为
+\begin{equation}
+X_{\mathrm{raw}}^{(v)}\in\R^{n\times d_v},\qquad v=1,\ldots,V,
+\end{equation}
+其中每一行对应一个样本，每一列对应该视图下的一个特征维度。在锚图优化阶段，为了与矩阵分解形式一致，采用列表示样本：
+\begin{equation}
+\widetilde X^{(v)}
+=\mathcal{N}\!\left((X_{\mathrm{raw}}^{(v)})^\T\right)
+\in\R^{d_v\times n},
+\end{equation}
+其中 \(\mathcal{N}(\cdot)\) 表示逐维标准化处理。后续记
+\(\widetilde x_i^{(v)}\in\R^{d_v}\) 为第 \(v\) 个视图中第 \(i\) 个样本的列向量。
+
+多视图聚类的目标是在不使用类别标签参与模型求解的条件下，学习每个样本的聚类标记
+\begin{equation}
+\hat y_i\in\{1,\ldots,c\},\qquad i=1,\ldots,n .
+\end{equation}
+标签只用于确定评价时的类别数以及计算聚类指标，不进入锚点选择、锚图学习或跨视图对齐的优化目标。
+
+\section{方法总体框架}
+
+本文方法属于锚点图多视图聚类。核心思想是在每个视图内自适应生成一组锚点，学习样本到锚点的概率型关系图，再将各视图锚图对齐到统一锚点空间并融合。与固定锚点数或仅依赖距离阈值的锚点选择不同，本文在 3AMVC 框架下引入 BIC 正则化似然比检验，用统计证据判断候选节点是否应继续分裂，从而得到视图自适应的锚点数量和锚点位置。
+
+对第 \(v\) 个视图，锚点选择阶段输出
+\begin{equation}
+\Theta^{(v)}
+=
+\begin{bmatrix}
+(\theta_1^{(v)})^\T\\
+\cdots\\
+(\theta_{m_v}^{(v)})^\T
+\end{bmatrix}
+\in\R^{m_v\times d_v},
+\end{equation}
+其中 \(m_v\) 是该视图自适应生成的锚点数。主优化阶段令
+\begin{equation}
+A^{(v)}\in\R^{d_v\times m_v}
+\end{equation}
+表示由锚点初始化并迭代更新的视图基矩阵，令
+\begin{equation}
+Z^{(v)}\in\R^{m_v\times n}
+\end{equation}
+表示第 \(v\) 个视图的锚图。矩阵 \(Z^{(v)}\) 的第 \(j\) 列 \(z_j^{(v)}\) 绑定第 \(j\) 个样本，列中第 \(k\) 个元素表示该样本与第 \(k\) 个锚点之间的关系强度。因此每一列是样本到锚点的概率分配，满足
+\begin{equation}
+z_j^{(v)}\ge 0,\qquad \one^\T z_j^{(v)}=1 .
+\end{equation}
+在列样本方向下，视图内锚图学习可写为
+\begin{equation}
+\widetilde X^{(v)}\approx A^{(v)}Z^{(v)} .
+\end{equation}
+若采用行样本方向并令
+\(\bar Z^{(v)}=(Z^{(v)})^\T\in\R^{n\times m_v}\)、
+\(\bar A^{(v)}=(A^{(v)})^\T\in\R^{m_v\times d_v}\)，则等价表示为
+\begin{equation}
+X_{\mathrm{raw}}^{(v)}\approx \bar Z^{(v)}\bar A^{(v)} ,
+\end{equation}
+这解释了常见的 \(X\approx ZA\) 写法：每个样本由锚点基向量的凸组合近似重构。
+
+不同视图可以选择不同数量和位置的锚点，且锚点索引并不天然一一对应。对于任意非基准视图，需要学习其锚点到基准视图锚点的匹配关系。若交换某一视图锚点顺序，则锚图的行也相应置换；因此跨视图对齐本质上是在锚点索引空间中学习置换或多对一映射。本文先利用锚点结构一致性得到硬匹配，再利用锚图关系向量的余弦相似度对匹配边赋权，最后采用等权平均融合所有对齐后的锚图。
+
+\section{符号定义}
+
+\begin{longtable}{>{\centering\arraybackslash}p{0.18\textwidth}
+                  >{\centering\arraybackslash}p{0.18\textwidth}
+                  p{0.54\textwidth}}
+\caption{主要数学符号及含义。}\\
+\toprule
+符号 & 维度 & 含义\\
+\midrule
+\endfirsthead
+\toprule
+符号 & 维度 & 含义\\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\(n\) & 标量 & 样本数\\
+\(V\) & 标量 & 视图数\\
+\(c\) & 标量 & 聚类类别数\\
+\(d_v\) & 标量 & 第 \(v\) 个视图的特征维度\\
+\(X_{\mathrm{raw}}^{(v)}\) & \(n\times d_v\) & 第 \(v\) 个视图的原始数据矩阵\\
+\(\widetilde X^{(v)}\) & \(d_v\times n\) & 转置并标准化后的第 \(v\) 个视图数据矩阵\\
+\(\Theta^{(v)}\) & \(m_v\times d_v\) & 第 \(v\) 个视图的锚点中心矩阵\\
+\(m_v\) & 标量 & 第 \(v\) 个视图的锚点数\\
+\(A^{(v)}\) & \(d_v\times m_v\) & 第 \(v\) 个视图的锚点基矩阵或投影矩阵\\
+\(Z^{(v)}\) & \(m_v\times n\) & 第 \(v\) 个视图的样本--锚点概率锚图\\
+\(z_j^{(v)}\) & \(m_v\times 1\) & 第 \(j\) 个样本在第 \(v\) 个视图中的锚点分配向量\\
+\(\beta\) & 标量 & 锚图 Frobenius 正则项系数\\
+\(\lambda\) & 标量 & 跨视图锚点结构对齐项权重\\
+\(\lambda_{\BIC}\) & 标量 & BIC 惩罚系数\\
+\(n_{\min}\) & 标量 & 候选子节点的最小样本数约束\\
+\(\tau\) & 标量 & 接受分裂的似然比得分阈值\\
+\(\epsv\) & 标量 & 方差和归一化中的数值保护常数\\
+\(G_b,G_i\) & \(m_b\times m_b\), \(m_i\times m_i\) & 基准视图与第 \(i\) 个视图的锚点结构图\\
+\(K_{bi}\) & \(m_b\times m_i\) & 基准视图与第 \(i\) 个视图之间的锚点关系相似矩阵\\
+\(P_i\) & \(m_b\times m_i\) & 第 \(i\) 个视图到基准视图的硬匹配矩阵\\
+\(T_i\) & \(m_b\times m_i\) & 第 \(i\) 个视图到基准视图的相似度加权映射矩阵\\
+\(S\) & \(m_b\times n\) & 融合后的统一锚图\\
+\(U\) & \(n\times r\) & 由融合锚图提取的样本嵌入，\(r=\min(n,m_b)\)\\
+\(\hat y\) & \(n\times 1\) & 最终聚类标签\\
+\end{longtable}
+
+\section{BIC 正则化似然比锚点选择}
+
+\subsection{节点统计量与平方误差}
+
+对任一待判断节点 \(C=\{x_1,\ldots,x_{n_C}\}\subset\R^d\)，其均值为
+\begin{equation}
+\mu_C=\frac{1}{n_C}\sum_{i=1}^{n_C}x_i .
+\end{equation}
+节点内平方误差定义为
+\begin{equation}
+W(C)=\sum_{i=1}^{n_C}\|x_i-\mu_C\|_2^2 .
+\end{equation}
+为了避免逐样本重复计算均值距离，可将其展开为
+\begin{align}
+W(C)
+&=\sum_{i=1}^{n_C}
+\left(x_i^\T x_i-2x_i^\T\mu_C+\mu_C^\T\mu_C\right) \notag\\
+&=\sum_{i=1}^{n_C}x_i^\T x_i
+-2\mu_C^\T\sum_{i=1}^{n_C}x_i
++n_C\mu_C^\T\mu_C \notag\\
+&=\sum_{i=1}^{n_C}x_i^\T x_i
+-\frac{1}{n_C}
+\left\|\sum_{i=1}^{n_C}x_i\right\|_2^2 .
+\label{eq:sse_expand}
+\end{align}
+实现中采用式 \eqref{eq:sse_expand} 计算节点 SSE，并将理论上非负的结果截断到非负范围，以消除浮点误差带来的微小负值。
+
+\subsection{原假设与备择假设}
+
+对当前节点 \(C\)，需要判断其是否还应继续分裂。本文采用局部二模型检验：
+\begin{align}
+H_0 &: C \text{ 由一个球形高斯分布解释，无需继续分裂},\\
+H_1 &: C \text{ 可由两个共享方差的球形高斯子分布解释}.
+\end{align}
+其中 \(H_0\) 对应当前节点作为一个锚点叶节点；\(H_1\) 对应将当前节点拆分为两个子节点，并继续递归判断。
+
+\subsection{单簇模型的极大似然}
+
+在 \(H_0\) 下，假设
+\begin{equation}
+x_i\sim\mathcal N(\mu_0,\sigma_0^2I_d),\qquad i=1,\ldots,n_C .
+\end{equation}
+似然函数为
+\begin{equation}
+L_0(C)
+=\prod_{i=1}^{n_C}
+(2\pi\sigma_0^2)^{-d/2}
+\exp\left(
+-\frac{\|x_i-\mu_0\|_2^2}{2\sigma_0^2}
+\right).
+\end{equation}
+取对数得
+\begin{equation}
+\log L_0(C)
+=-\frac{n_Cd}{2}\log(2\pi\sigma_0^2)
+-\frac{1}{2\sigma_0^2}
+\sum_{i=1}^{n_C}\|x_i-\mu_0\|_2^2 .
+\end{equation}
+对 \(\mu_0\) 求导：
+\begin{equation}
+\frac{\partial}{\partial\mu_0}
+\sum_i\|x_i-\mu_0\|_2^2
+=2n_C\mu_0-2\sum_i x_i .
+\end{equation}
+令导数为零可得极大似然估计
+\begin{equation}
+\hat\mu_0=\frac{1}{n_C}\sum_i x_i .
+\end{equation}
+进一步对 \(\sigma_0^2\) 求导：
+\begin{equation}
+\frac{\partial \log L_0}{\partial \sigma_0^2}
+=-\frac{n_Cd}{2\sigma_0^2}
++\frac{W_0}{2(\sigma_0^2)^2},
+\end{equation}
+其中 \(W_0=W(C)\)。令其为零得到
+\begin{equation}
+\hat\sigma_0^2=\frac{W_0}{n_Cd}.
+\end{equation}
+考虑数值稳定性，实际采用
+\begin{equation}
+\sigma_0^2=\frac{W_0}{n_Cd}+\epsv .
+\end{equation}
+代回对数似然，得到
+\begin{equation}
+\log L_0(C)
+=-\frac{n_Cd}{2}
+\left[\log(2\pi\sigma_0^2)+1\right].
+\label{eq:loglik_single}
+\end{equation}
+
+\subsection{双簇共享方差模型的极大似然}
+
+对候选划分 \(C=C_1\cup C_2\)，令
+\[
+n_1=|C_1|,\quad n_2=|C_2|,\quad n_C=n_1+n_2,
+\]
+并定义混合比例
+\begin{equation}
+\pi_1=\frac{n_1}{n_C},\qquad
+\pi_2=\frac{n_2}{n_C}.
+\end{equation}
+在 \(H_1\) 下，两个子节点服从共享球形方差的高斯模型：
+\begin{equation}
+x\in C_k\sim \mathcal N(\mu_k,\sigma_{12}^2I_d),
+\qquad k=1,2 .
+\end{equation}
+条件于候选划分，完整对数似然为
+\begin{align}
+\log L_1(C_1,C_2)
+&=
+\sum_{k=1}^{2}\sum_{x_i\in C_k}
+\log\left[
+\pi_k(2\pi\sigma_{12}^2)^{-d/2}
+\exp\left(
+-\frac{\|x_i-\mu_k\|_2^2}{2\sigma_{12}^2}
+\right)
+\right]\notag\\
+&=
+n_1\log\pi_1+n_2\log\pi_2
+-\frac{n_Cd}{2}\log(2\pi\sigma_{12}^2)
+-\frac{W_1+W_2}{2\sigma_{12}^2},
+\end{align}
+其中 \(W_k=W(C_k)\)。类似单簇情形，均值的极大似然估计是各子节点样本均值，共享方差估计为
+\begin{equation}
+\sigma_{12}^2=\frac{W_1+W_2}{n_Cd}+\epsv .
+\end{equation}
+于是
+\begin{equation}
+\log L_1(C_1,C_2)
+=n_1\log\pi_1+n_2\log\pi_2
+-\frac{n_Cd}{2}
+\left[\log(2\pi\sigma_{12}^2)+1\right].
+\label{eq:loglik_double}
+\end{equation}
+全文均采用共享方差假设；即两个子分布拥有不同均值，但使用同一个球形方差 \(\sigma_{12}^2\)。
+
+\subsection{似然比统计量与 BIC 证据校准}
+
+不加复杂度校正时，局部似然比统计量为
+\begin{equation}
+\Lambda(C_1,C_2)
+=2\left[\log L_1(C_1,C_2)-\log L_0(C)\right].
+\end{equation}
+双簇模型通常具有更强拟合能力，若只依据 \(\Lambda\) 判断，容易产生过度分裂。因此引入 BIC 型惩罚，定义正则化切分得分：
+\begin{equation}
+\mathcal S(C_1,C_2)
+=
+2\left[\log L_1(C_1,C_2)-\log L_0(C)\right]
+-\lambda_{\BIC}(d+1)\log n_C .
+\label{eq:bic_lr_score}
+\end{equation}
+其中 \(\lambda_{\BIC}\ge0\) 控制惩罚强度。惩罚项的作用是抵消双簇模型由于新增参数带来的自然拟合优势：维度 \(d\) 对应新增均值自由度量级，额外常数项对应方差或模型复杂度增量的校准。该项越大，接受分裂越保守，生成锚点通常越少。
+
+对所有候选切分，选择
+\begin{equation}
+(C_1^\star,C_2^\star)
+=\argmax_{(C_1,C_2)\in\mathcal P(C)}
+\mathcal S(C_1,C_2),
+\end{equation}
+其中 \(\mathcal P(C)\) 是满足最小子节点规模约束的候选集合。若
+\begin{equation}
+\mathcal S(C_1^\star,C_2^\star)>\tau ,
+\end{equation}
+则接受分裂；否则将当前节点作为叶节点。默认 \(\tau=0\)，表示只有当 BIC 校准后的似然证据为正时才继续分裂。
+
+\subsection{候选切分的确定性扫描}
+
+直接枚举所有二分组合不可行。因此本文采用确定性的一维候选生成策略。首先对当前节点样本中心化：
+\begin{equation}
+\bar X_C=X_C-\one\mu_C^\T .
+\end{equation}
+对 \(\bar X_C\) 做经济型奇异值分解：
+\begin{equation}
+\bar X_C=U_C\Sigma_CV_C^\T .
+\end{equation}
+取第一主方向 \(v_1\)，将样本投影为
+\begin{equation}
+p_i=(x_i-\mu_C)^\T v_1 .
+\end{equation}
+随后按 \(p_i\) 升序排序，并扫描满足
+\begin{equation}
+n_{\min}\le t\le n_C-n_{\min}
+\end{equation}
+的切分位置。最小节点规模 \(n_{\min}\) 的作用是避免极小子节点造成不稳定似然估计或过细锚点划分。它是工程和统计稳定性约束，不单独构成理论创新。
+
+投影方向只用于生成候选切分顺序，式 \eqref{eq:loglik_single}、\eqref{eq:loglik_double} 和 \eqref{eq:bic_lr_score} 中的 SSE 与似然均在原始 \(d\) 维特征空间中计算。为了加速扫描，排序后构造前缀和与前缀平方和。对左侧前 \(t\) 个样本：
+\begin{equation}
+W_{\mathrm{L}}(t)
+=
+\sum_{i=1}^{t}x_i^\T x_i
+-\frac{1}{t}
+\left\|\sum_{i=1}^{t}x_i\right\|_2^2 ,
+\end{equation}
+右侧同理：
+\begin{equation}
+W_{\mathrm{R}}(t)
+=
+\sum_{i=t+1}^{n_C}x_i^\T x_i
+-\frac{1}{n_C-t}
+\left\|\sum_{i=t+1}^{n_C}x_i\right\|_2^2 .
+\end{equation}
+由此每个候选切分可以用前缀统计量快速得到 \(W_1,W_2\)，避免在扫描过程中反复计算均值。
+
+\subsection{视图级 BIC 证据与基准视图选择}
+
+某一视图完成递归分裂后，得到 \(m_v\) 个叶节点。第 \(k\) 个叶节点的锚点为
+\begin{equation}
+\theta_k^{(v)}
+=\frac{1}{|C_k^{(v)}|}
+\sum_{x_i\in C_k^{(v)}}x_i .
+\end{equation}
+设该视图最终划分的总 SSE 为
+\begin{equation}
+W_{\mathrm{part}}^{(v)}
+=\sum_{k=1}^{m_v}W(C_k^{(v)}),
+\end{equation}
+混合比例为
+\begin{equation}
+\pi_k^{(v)}=\frac{|C_k^{(v)}|}{n}.
+\end{equation}
+将最终划分视为 \(m_v\) 分量共享方差球形高斯模型，其对数似然为
+\begin{equation}
+\log L_{\mathrm{part}}^{(v)}
+=
+\sum_{k=1}^{m_v}|C_k^{(v)}|\log \pi_k^{(v)}
+-\frac{nd_v}{2}
+\left[
+\log(2\pi\sigma_{\mathrm{part}}^2)+1
+\right],
+\end{equation}
+其中
+\begin{equation}
+\sigma_{\mathrm{part}}^2
+=\frac{W_{\mathrm{part}}^{(v)}}{nd_v}+\epsv .
+\end{equation}
+与整视图单簇模型相比，定义 BIC 证据增益
+\begin{equation}
+\Delta_{\BIC}^{(v)}
+=
+2\left[
+\log L_{\mathrm{part}}^{(v)}
+-\log L_0^{(v)}
+\right]
+-\lambda_{\BIC}(m_v-1)(d_v+1)\log n .
+\end{equation}
+进一步归一化为单位证据增益
+\begin{equation}
+q^{(v)}
+=
+\frac{\Delta_{\BIC}^{(v)}}{2nd_v}.
+\end{equation}
+本文以
+\begin{equation}
+b=\argmax_{v\in\{1,\ldots,V\}} q^{(v)}
+\end{equation}
+选择基准视图。该选择表示：相对于单簇解释，基准视图的锚点划分在单位观测自由度上提供了最大的 BIC 校准证据。需要强调的是，\(q^{(v)}\) 仅用于基准视图选择，最终融合仍采用等权平均。
+
+\section{多视图锚图学习目标}
+
+在每个视图中，给定锚点初始化后，学习 \(A^{(v)}\) 与 \(Z^{(v)}\)。根据实现中的目标函数轨迹，可反推出主优化目标：
+\begin{equation}
+\min_{\{A^{(v)},Z^{(v)}\}_{v=1}^{V}}
+\sum_{v=1}^{V}
+\left\|
+\widetilde X^{(v)}-A^{(v)}Z^{(v)}
+\right\|_F^2
++
+\beta
+\sum_{v=1}^{V}
+\left\|Z^{(v)}\right\|_F^2 ,
+\label{eq:main_objective}
+\end{equation}
+满足
+\begin{equation}
+Z_{\cdot j}^{(v)}\ge0,\qquad
+\one^\T Z_{\cdot j}^{(v)}=1,
+\quad
+j=1,\ldots,n.
+\label{eq:z_simplex}
+\end{equation}
+第一项衡量每个视图中由锚点基矩阵和锚图重构样本的误差；第二项抑制锚图幅度，避免过大的锚点响应。\(\beta\) 越大，对 \(Z^{(v)}\) 的收缩越强。
+
+Frobenius 范数满足
+\begin{equation}
+\|M\|_F^2=\tr(M^\T M).
+\end{equation}
+因此单视图重构项展开为
+\begin{align}
+\|\widetilde X-AZ\|_F^2
+&=
+\tr\!\left[
+(\widetilde X-AZ)^\T
+(\widetilde X-AZ)
+\right]\notag\\
+&=
+\tr(\widetilde X^\T\widetilde X)
+-2\tr(Z^\T A^\T\widetilde X)
++\tr(Z^\T A^\T A Z).
+\label{eq:fro_expand}
+\end{align}
+式 \eqref{eq:fro_expand} 是后续变量更新的基础。
+
+\section{优化变量更新推导}
+
+\subsection{更新视图基矩阵：最小二乘与正交 Procrustes}
+
+固定 \(Z\) 后，单视图子问题为
+\begin{equation}
+\min_A\ \|\widetilde X-AZ\|_F^2 .
+\label{eq:a_subproblem}
+\end{equation}
+省略视图上标。由式 \eqref{eq:fro_expand} 对 \(A\) 求导：
+\begin{equation}
+\frac{\partial}{\partial A}
+\|\widetilde X-AZ\|_F^2
+=2(AZZ^\T-\widetilde XZ^\T).
+\end{equation}
+令导数为零得到正规方程
+\begin{equation}
+AZZ^\T=\widetilde XZ^\T .
+\end{equation}
+若不施加正交约束，则最小二乘解为
+\begin{equation}
+A^\star=\widetilde XZ^\T(ZZ^\T)^\dagger ,
+\label{eq:a_lsq}
+\end{equation}
+其中 \((\cdot)^\dagger\) 为 Moore--Penrose 广义逆。该形式用于处理 \(d_v<m_v\) 或 \(ZZ^\T\) 条件不佳的情形。
+
+当 \(d_v\ge m_v\) 时，可以对 \(A\) 施加列正交约束
+\begin{equation}
+A^\T A=I_{m_v}.
+\end{equation}
+此时
+\begin{equation}
+\tr(Z^\T A^\T A Z)=\tr(Z^\T Z)
+\end{equation}
+与 \(A\) 无关。因此式 \eqref{eq:a_subproblem} 等价于
+\begin{equation}
+\max_{A^\T A=I}\ \tr(A^\T \widetilde XZ^\T).
+\end{equation}
+令
+\begin{equation}
+C=\widetilde XZ^\T,\qquad C=U_C\Sigma_CV_C^\T
+\end{equation}
+为经济型奇异值分解，则正交 Procrustes 解为
+\begin{equation}
+A^\star=U_CV_C^\T .
+\label{eq:a_procrustes}
+\end{equation}
+推导如下：
+\begin{align}
+\tr(A^\T C)
+&=\tr(A^\T U_C\Sigma_CV_C^\T) \notag\\
+&=\tr(V_C^\T A^\T U_C\Sigma_C).
+\end{align}
+记 \(Q=V_C^\T A^\T U_C\)。在 \(A^\T A=I\) 下，\(Q\) 的奇异值不超过 1，因此
+\begin{equation}
+\tr(Q\Sigma_C)\le\sum_j\sigma_j(C),
+\end{equation}
+当 \(Q=I\) 时取等号，对应 \(A=U_CV_C^\T\)。
+
+\subsection{更新锚图矩阵：概率单纯形投影}
+
+固定 \(A\) 后，单视图子问题为
+\begin{equation}
+\min_Z\
+\|\widetilde X-AZ\|_F^2+\beta\|Z\|_F^2,
+\quad
+Z_{\cdot j}\in\Delta,\ j=1,\ldots,n,
+\label{eq:z_subproblem}
+\end{equation}
+其中
+\begin{equation}
+\Delta=\{z\in\R^{m_v}\mid z\ge0,\ \one^\T z=1\}.
+\end{equation}
+若采用正交分支 \(A^\T A=I\)，则对第 \(j\) 个样本有
+\begin{align}
+\|\widetilde x_j-Az_j\|_2^2+\beta\|z_j\|_2^2
+&=
+\widetilde x_j^\T\widetilde x_j
+-2z_j^\T A^\T\widetilde x_j
++z_j^\T A^\T A z_j
++\beta z_j^\T z_j \notag\\
+&=
+\widetilde x_j^\T\widetilde x_j
+-2z_j^\T A^\T\widetilde x_j
++(1+\beta)z_j^\T z_j .
+\end{align}
+去掉常数项后，
+\begin{equation}
+\min_{z_j\in\Delta}
+(1+\beta)\|z_j\|_2^2
+-2z_j^\T A^\T\widetilde x_j .
+\end{equation}
+配方可得
+\begin{align}
+&(1+\beta)\|z_j\|_2^2
+-2z_j^\T A^\T\widetilde x_j \notag\\
+&\quad =
+(1+\beta)
+\left\|
+z_j-\frac{A^\T\widetilde x_j}{1+\beta}
+\right\|_2^2
++\mathrm{const}.
+\end{align}
+因此
+\begin{equation}
+z_j^\star
+=
+\Pi_{\Delta}
+\left(
+\frac{A^\T\widetilde x_j}{1+\beta}
+\right),
+\label{eq:z_projection}
+\end{equation}
+其中 \(\Pi_{\Delta}\) 表示投影到概率单纯形。
+
+需要注意的是，当采用广义逆最小二乘分支更新 \(A\) 时，\(A^\T A=I\) 不一定严格成立。严格的二次子问题应为
+\begin{equation}
+\min_{z_j\in\Delta}
+z_j^\T(A^\T A+\beta I)z_j
+-2z_j^\T A^\T\widetilde x_j .
+\end{equation}
+然而实际求解仍采用式 \eqref{eq:z_projection} 的投影形式。因此，式 \eqref{eq:z_projection} 是与正交分支严格一致、并被整体实现沿用的锚图更新。
+
+\subsection{概率单纯形投影的 KKT 推导}
+
+对任意向量 \(v\in\R^m\)，单纯形投影求解
+\begin{equation}
+\min_x\ \frac{1}{2}\|x-v\|_2^2,
+\qquad
+x\ge0,\quad \one^\T x=k .
+\label{eq:simplex_problem}
+\end{equation}
+默认 \(k=1\)。构造拉格朗日函数
+\begin{equation}
+\mathcal{L}(x,\lambda,\eta)
+=
+\frac{1}{2}\|x-v\|_2^2
+\lambda(\one^\T x-k)-\eta^\T x,
+\quad \eta_i\ge0.
+\end{equation}
+KKT 条件为
+\begin{align}
+x_i-v_i+\lambda-\eta_i&=0,\\
+\eta_i x_i&=0,\\
+x_i&\ge0,\quad \eta_i\ge0.
+\end{align}
+当 \(x_i>0\) 时，\(\eta_i=0\)，于是 \(x_i=v_i-\lambda\)；当 \(x_i=0\) 时，有 \(v_i-\lambda\le0\)。因此最优解具有截断形式
+\begin{equation}
+x_i=\max(v_i-\lambda,0).
+\end{equation}
+标量 \(\lambda\) 由等式约束确定：
+\begin{equation}
+\sum_{i=1}^{m}\max(v_i-\lambda,0)=k .
+\end{equation}
+实现中先将输入平移为一个和为 \(k\) 的向量
+\begin{equation}
+v_0=v-\bar v\one+\frac{k}{m}\one .
+\end{equation}
+若 \(v_0\ge0\)，则 \(v_0\) 已在单纯形上；否则通过 Newton 迭代求解上述 \(\lambda\)，并返回 \(\max(v_0-\lambda,0)\)。
+
+\section{跨视图锚点对齐}
+
+\subsection{锚点结构图与跨视图相似矩阵}
+
+设 \(b\) 为基准视图，\(i\ne b\) 为任一待对齐视图。由锚图构造锚点结构图：
+\begin{equation}
+G_b=Z^{(b)}(Z^{(b)})^\T\in\R^{m_b\times m_b},
+\qquad
+G_i=Z^{(i)}(Z^{(i)})^\T\in\R^{m_i\times m_i}.
+\end{equation}
+矩阵 \(G_b\) 的第 \((p,q)\) 个元素衡量基准视图中第 \(p\) 与第 \(q\) 个锚点在所有样本上的关系相似性；\(G_i\) 同理。跨视图锚点关系相似矩阵为
+\begin{equation}
+K_{bi}=Z^{(b)}(Z^{(i)})^\T\in\R^{m_b\times m_i}.
+\end{equation}
+其第 \((p,q)\) 个元素是基准视图第 \(p\) 个锚点关系向量与第 \(i\) 个视图第 \(q\) 个锚点关系向量的内积。
+
+\subsection{投影固定点匹配目标}
+
+对齐矩阵 \(P_i\in\R^{m_b\times m_i}\) 通过以下目标学习：
+\begin{equation}
+\max_{P_i}
+\ f(P_i)
+=
+\langle K_{bi},P_i\rangle
+\lambda\tr(G_bP_iG_iP_i^\T).
+\label{eq:dspfp_objective}
+\end{equation}
+第一项
+\begin{equation}
+\langle K_{bi},P_i\rangle
+=\sum_{p=1}^{m_b}\sum_{q=1}^{m_i}
+(K_{bi})_{pq}(P_i)_{pq}
+\end{equation}
+鼓励匹配具有相似样本关系的锚点；第二项鼓励匹配后保持两视图锚点结构图的一致性。\(\lambda\) 控制结构一致性项的强度。
+
+对式 \eqref{eq:dspfp_objective} 求梯度。线性项梯度为
+\begin{equation}
+\nabla_P\langle K,P\rangle=K.
+\end{equation}
+结构项记作
+\[
+h(P)=\tr(G_bPG_iP^\T).
+\]
+其微分为
+\begin{align}
+dh
+&=
+\tr(G_b\,dP\,G_iP^\T)
++\tr(G_bPG_i\,dP^\T) \notag\\
+&=
+\tr\!\left((G_b^\T P G_i^\T)^\T dP\right)
++\tr\!\left((G_bPG_i)^\T dP\right).
+\end{align}
+由于 \(G_b\) 与 \(G_i\) 均为 \(ZZ^\T\) 形式，是对称矩阵，因此
+\begin{equation}
+\nabla_P h(P)=2G_bPG_i .
+\end{equation}
+故总体梯度为
+\begin{equation}
+\nabla f(P)=K+2\lambda G_bPG_i .
+\label{eq:p_gradient}
+\end{equation}
+
+采用投影固定点迭代：
+\begin{equation}
+P^{(t+1)}
+=(1-\alpha)P^{(t)}
++\alpha\,\Gamma\!\left(\nabla f(P^{(t)})\right),
+\label{eq:pfp_update}
+\end{equation}
+其中 \(\alpha=0.5\)，\(\Gamma(\cdot)\) 表示非负双随机约束的投影近似。为适配不同锚点数，梯度矩阵先被补为方阵，再执行固定轮数的行列归一化与非负截断。每次更新后还进行尺度归一化：
+\begin{equation}
+P^{(t+1)}
+\leftarrow
+\frac{P^{(t+1)}}{\max_{p,q}|P_{pq}^{(t+1)}|},
+\end{equation}
+用于避免数值尺度持续放大。
+
+连续匹配矩阵收敛后，对每个非基准视图锚点 \(q\) 执行硬化：
+\begin{equation}
+p^\star(q)=\argmax_p P_{pq},
+\end{equation}
+\[
+(P_{\mathrm{hard}})_{p^\star(q),q}=1,\qquad
+(P_{\mathrm{hard}})_{p,q}=0\quad (p\ne p^\star(q)).
+\]
+因此，每个非基准锚点被指派到一个基准锚点，而一个基准锚点可接收多个非基准锚点。
+
+\subsection{相似度加权映射}
+
+硬匹配只表示锚点对应关系，不反映匹配强弱。进一步计算锚图行向量的余弦相似度：
+\begin{equation}
+R_{pq}
+=
+\frac{
+(Z^{(b)})_{p\cdot}
+\left((Z^{(i)})_{q\cdot}\right)^\T
+}{
+\|(Z^{(b)})_{p\cdot}\|_2
+\|(Z^{(i)})_{q\cdot}\|_2+\epsv
+}.
+\end{equation}
+取其非负部分 \(R_{pq}^{+}=\max(R_{pq},0)\) 作为边权来源。若第 \(p\) 个基准锚点对应的非基准锚点集合为 \(\mathcal N(p)\)，则在多对一情形下
+\begin{equation}
+(T_i)_{pq}
+=
+\frac{R_{pq}^{+}}
+{\sum_{q'\in\mathcal N(p)}R_{pq'}^{+}},
+\qquad q\in\mathcal N(p).
+\end{equation}
+若非基准锚点数少于基准锚点数，则可能存在未覆盖的基准锚点。此时为未覆盖基准锚点补充最相似的非基准锚点，再对同一非基准锚点覆盖的基准集合 \(\mathcal B(q)\) 做归一化：
+\begin{equation}
+(T_i)_{pq}
+=
+\frac{R_{pq}^{+}}
+{\sum_{p'\in\mathcal B(q)}R_{p'q}^{+}},
+\qquad p\in\mathcal B(q).
+\end{equation}
+若归一化分母为零或出现非有限值，则使用均匀权重。由此得到非负加权映射矩阵 \(T_i\)，并将第 \(i\) 个视图的锚图对齐到基准锚点空间：
+\begin{equation}
+\bar Z^{(i)}=T_iZ^{(i)}\in\R^{m_b\times n}.
+\end{equation}
+对齐后每一列再次归一化，以保持非负且列和为 1。
+
+\section{等权融合与聚类}
+
+\subsection{融合锚图}
+
+所有非基准视图对齐后，统一锚图采用等权平均：
+\begin{equation}
+S=
+\frac{1}{V}
+\left(
+Z^{(b)}+\sum_{i\ne b}\bar Z^{(i)}
+\right)
+=
+\frac{1}{V}
+\left(
+Z^{(b)}+\sum_{i\ne b}T_iZ^{(i)}
+\right).
+\label{eq:fusion}
+\end{equation}
+随后对 \(S\) 的每一列执行非负化与归一化：
+\begin{equation}
+S_{\cdot j}
+\leftarrow
+\frac{\max(S_{\cdot j},0)}
+{\max(\one^\T\max(S_{\cdot j},0),\epsv)} .
+\end{equation}
+若某列的和无效或过小，则将该列置为均匀分布。融合过程没有引入额外视图权重，所有视图在对齐后具有相同权重。
+
+\subsection{奇异向量嵌入与 KMeans}
+
+对融合锚图转置进行经济型奇异值分解：
+\begin{equation}
+S^\T=U\Sigma V^\T,
+\qquad U\in\R^{n\times r},\quad r=\min(n,m_b).
+\end{equation}
+矩阵 \(U\) 作为样本嵌入。聚类前对其每一行进行归一化：
+\begin{equation}
+\bar u_i=
+\frac{u_i}
+{\max(\|u_i\|_2,\epsv)} .
+\end{equation}
+随后在嵌入空间执行 KMeans：
+\begin{equation}
+\min_{\{\mathcal C_k\}_{k=1}^{c},\{\mu_k\}_{k=1}^{c}}
+\sum_{k=1}^{c}
+\sum_{i\in\mathcal C_k}
+\|\bar u_i-\mu_k\|_2^2 .
+\end{equation}
+给定中心时，标签分配为
+\begin{equation}
+\hat y_i=\argmin_{k}
+\|\bar u_i-\mu_k\|_2^2 ;
+\end{equation}
+给定标签时，中心更新为
+\begin{equation}
+\mu_k=
+\frac{1}{|\mathcal C_k|}
+\sum_{i\in\mathcal C_k}\bar u_i .
+\end{equation}
+若出现空簇，则从当前距离较大的样本中补充缺失簇，以保证聚类数不退化。
+
+\section{完整算法}
+
+\begin{algorithm}[H]
+\caption{BIC-LR 自适应锚点图多视图聚类}
+\begin{algorithmic}[1]
+\Require 多视图数据 \(\{X_{\mathrm{raw}}^{(v)}\}_{v=1}^{V}\)，聚类数 \(c\)，参数 \(\beta,\lambda,\lambda_{\BIC},n_{\min},\tau,\epsv\)，最大迭代次数 \(T_{\max}\)。
+\Ensure 聚类标签 \(\hat y\)，融合锚图 \(S\)，样本嵌入 \(U\)。
+\For{\(v=1,\ldots,V\)}
+  \State 在视图 \(v\) 上执行 BIC-LR 递归二分，得到锚点 \(\Theta^{(v)}\)、叶节点 SSE 与样本--锚点标签。
+  \State 计算该视图的单位 BIC 证据增益 \(q^{(v)}\)。
+\EndFor
+\State 选择基准视图 \(b=\argmax_v q^{(v)}\)。
+\For{\(v=1,\ldots,V\)}
+  \State 标准化数据得到 \(\widetilde X^{(v)}\)，初始化 \(A^{(v)}=(\Theta^{(v)})^\T\)。
+  \State 令 \(M^{(v)}=(A^{(v)})^\T\widetilde X^{(v)}\)，逐列投影到概率单纯形，初始化 \(Z^{(v)}\)。
+\EndFor
+\For{\(t=1,\ldots,T_{\max}\)}
+  \For{\(v=1,\ldots,V\)}
+    \State 固定 \(Z^{(v)}\)，由式 \eqref{eq:a_lsq} 或式 \eqref{eq:a_procrustes} 更新 \(A^{(v)}\)。
+    \State 固定 \(A^{(v)}\)，由式 \eqref{eq:z_projection} 逐列更新 \(Z^{(v)}\)。
+  \EndFor
+  \State 计算目标函数 \(J^{(t)}\)。
+  \If{\(t>9\) 且相对目标变化小于阈值}
+    \State 停止主优化。
+    \State \textbf{break}
+  \EndIf
+\EndFor
+\For{每个 \(i\ne b\)}
+  \State 构造 \(G_b=Z^{(b)}(Z^{(b)})^\T\)、\(G_i=Z^{(i)}(Z^{(i)})^\T\)、\(K_{bi}=Z^{(b)}(Z^{(i)})^\T\)。
+  \State 根据式 \eqref{eq:pfp_update} 学习匹配矩阵，并硬化为 \(P_i\)。
+  \State 根据余弦相似度构造加权映射 \(T_i\)，得到 \(\bar Z^{(i)}=T_iZ^{(i)}\)。
+\EndFor
+\State 根据式 \eqref{eq:fusion} 等权融合得到 \(S\)，并列归一化。
+\State 对 \(S^\T\) 做 SVD，得到样本嵌入 \(U\)。
+\State 对 \(U\) 行归一化后执行 KMeans，得到 \(\hat y\)。
+\end{algorithmic}
+\end{algorithm}
+
+\section{收敛性与停止准则}
+
+该实现采用经验停止准则。主优化阶段记录
+\begin{equation}
+J^{(t)}
+=
+\sum_{v=1}^{V}
+\|\widetilde X^{(v)}-A^{(v)}Z^{(v)}\|_F^2
++\beta
+\sum_{v=1}^{V}
+\|Z^{(v)}\|_F^2 .
+\end{equation}
+在至少执行若干轮迭代后，计算相邻目标的相对变化：
+\begin{equation}
+\rho^{(t)}
+=
+\left|
+\frac{J^{(t-1)}-J^{(t)}}
+{\max(|J^{(t-1)}|,\epsv)}
+\right|.
+\end{equation}
+若
+\begin{equation}
+\rho^{(t)}<10^{-6}
+\end{equation}
+或目标值已经足够小，则停止主优化并进入对齐阶段。主循环还设有最大迭代次数。跨视图匹配阶段同样采用变量变化阈值：
+\begin{equation}
+\max_{p,q}|P_{pq}^{(t+1)}-P_{pq}^{(t)}|<10^{-6},
+\end{equation}
+或达到最大匹配迭代次数即停止。本文不声称额外的理论收敛证明；上述准则是实现中的经验判据。
+
+\section{复杂度分析}
+
+以下复杂度根据主要矩阵运算估计。设主优化迭代次数为 \(T\)，匹配迭代次数为 \(T_p\)，KMeans 迭代次数为 \(T_k\)，第 \(v\) 个视图的维度与锚点数分别为 \(d_v,m_v\)，基准视图锚点数为 \(m_b\)。
+
+\subsection{BIC-LR 锚点选择复杂度}
+
+对包含 \(s\) 个样本的节点，主要开销包括中心化和 SSE 计算 \(O(sd_v)\)、经济型 SVD 约 \(O(sd_v\min(s,d_v))\)、投影排序 \(O(s\log s)\)，以及前缀统计和候选扫描 \(O(sd_v)\)。整棵递归树的开销为所有节点代价之和：
+\begin{equation}
+O\!\left(
+\sum_{C}
+\left[
+|C|d_v\min(|C|,d_v)
++|C|\log |C|
+\right]
+\right).
+\end{equation}
+锚点安全上限限制了递归树规模。
+
+\subsection{视图内锚图优化复杂度}
+
+每次主迭代中，第 \(v\) 个视图主要包含：
+\begin{itemize}
+  \item 计算 \(\widetilde X^{(v)}(Z^{(v)})^\T\)：\(O(d_vnm_v)\)；
+  \item 计算 \(Z^{(v)}(Z^{(v)})^\T\)：\(O(m_v^2n)\)；
+  \item 广义逆分支最坏约 \(O(m_v^3)\)；
+  \item SVD Procrustes 分支约 \(O(d_vm_v^2)\)；
+  \item 计算 \((A^{(v)})^\T\widetilde X^{(v)}\)：\(O(d_vnm_v)\)；
+  \item \(n\) 个 \(m_v\) 维单纯形投影，记投影平均迭代次数为 \(T_s\)，约 \(O(nm_vT_s)\)。
+\end{itemize}
+因此主优化总复杂度可估计为
+\begin{equation}
+O\!\left(
+T\sum_{v=1}^{V}
+\left[
+d_vnm_v+m_v^2n+m_v^3+d_vm_v^2+nm_vT_s
+\right]
+\right).
+\end{equation}
+
+\subsection{跨视图对齐与聚类复杂度}
+
+对非基准视图 \(i\)，构造 \(K_{bi}\) 需要 \(O(m_bm_in)\)，构造 \(G_i\) 需要 \(O(m_i^2n)\)。匹配迭代中计算 \(G_bPG_i\) 的复杂度约为
+\begin{equation}
+O(m_b^2m_i+m_bm_i^2).
+\end{equation}
+投影近似在 \(m_{\max}\times m_{\max}\) 方阵上执行固定轮数，复杂度约为 \(O(m_{\max}^2)\)，其中 \(m_{\max}=\max(m_b,m_i)\)。加权对齐 \(T_iZ^{(i)}\) 需要 \(O(m_bm_in)\)。
+
+融合后，\(S^\T\in\R^{n\times m_b}\) 的经济型 SVD 在 \(n\ge m_b\) 时约为
+\begin{equation}
+O(nm_b^2).
+\end{equation}
+KMeans 在 \(r\) 维嵌入上运行，单次迭代复杂度约为 \(O(ncr)\)。若重复运行 \(R\) 次且每次内部重复 \(R_k\) 次，评价阶段复杂度约为
+\begin{equation}
+O(RR_kT_kncr).
+\end{equation}
+
+\section{方法特点与边界}
+
+本文方法的主要特点如下：
+\begin{enumerate}
+  \item \textbf{自适应锚点选择。} 每个视图通过 BIC 正则化似然比判断是否继续分裂，使锚点数量由数据分布和统计证据共同决定。
+  \item \textbf{概率锚图表示。} 每个样本到锚点的关系向量满足非负和列和为 1，具有明确的分配含义。
+  \item \textbf{跨视图锚点对齐。} 不同视图锚点数和索引可以不同，因此通过锚点结构图和跨视图关系矩阵学习映射关系。
+  \item \textbf{结构保持匹配。} 匹配目标同时考虑锚点关系向量相似性和锚点结构一致性。
+  \item \textbf{等权融合。} 对齐后的锚图采用简单等权平均，没有引入额外视图权重变量。
+  \item \textbf{奇异向量嵌入。} 最终聚类基于融合锚图诱导的样本嵌入，而不是直接在原始特征空间执行。
+\end{enumerate}
+
+需要谨慎的是：当视图维度小于锚点数时，投影矩阵更新使用最小二乘形式而非正交 Procrustes 形式；此时锚图投影更新仍沿用正交情形下的简化公式。该分支应被理解为实现中的兼容处理。另一个需要确认的部分是相似度加权映射在论文叙述中的定位：它是当前实现的真实对齐步骤，但是否作为主要方法贡献，需要结合最终论文口径确定。
+
+\end{document}

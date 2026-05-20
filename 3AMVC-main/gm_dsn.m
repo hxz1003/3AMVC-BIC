@@ -18,6 +18,8 @@ end
 
 n = size(X, 1);
 
+% 30 次迭代为原始 DSPFP 实现中的固定投影近似次数；该函数只处理锚点级
+% 匹配矩阵，保持固定次数有助于与原始对齐路径兼容。
 for outerIter = 1:30
     rowMean = sum(X, 2)' / n;
     colMean = sum(X, 1) / n;

@@ -1,0 +1,16 @@
+Dataset,Method,FixedFrom,ChangedOnly,beta,lambda,lambdaBIC,minNodeSize,tauSplit,epsVar,numRuns,seed,A0TargetView,TargetView,StrictControlNote
+Mfeat,A1_fixed_woBIC,A0_best_res_biclr_refined,仅关闭 BIC 复杂度惩罚：lambdaBIC 从 0.75 改为 0；不重新搜索参数。,100,1000,0,32,0,1e-08,10,1,1,1,只改 lambdaBIC=0；targetView=1 是关闭惩罚后的证据选择结果。
+Mfeat,A3_fixed_SSETarget,A0_best_res_biclr_refined,仅将目标视图选择准则从 BICUnitEvidence 改为 SSEMin；不重新搜索参数。,100,1000,0.75,32,0,1e-08,10,1,1,1,只改 target rule；A0/BIC target=1，SSE target=1。
+Mfeat,A4_fixed_woMultiViewFusion,A0_best_res_biclr_refined,仅关闭多视图对齐融合，使用目标视图单视图锚图聚类；lambda 记录但不参与计算。,100,1000,0.75,32,0,1e-08,10,1,1,1,只关融合；lambdaNotUsed=true，alignmentTime=0。
+Reuters-1200,A1_fixed_woBIC,A0_best_res_biclr_refined,仅关闭 BIC 复杂度惩罚：lambdaBIC 从 0.35 改为 0；不重新搜索参数。,2000,1000,0,16,0,1e-08,8,1,1,3,只改 lambdaBIC=0；targetView=3 是关闭惩罚后的证据选择结果。
+Reuters-1200,A3_fixed_SSETarget,A0_best_res_biclr_refined,仅将目标视图选择准则从 BICUnitEvidence 改为 SSEMin；不重新搜索参数。,2000,1000,0.35,16,0,1e-08,8,1,1,3,只改 target rule；A0/BIC target=1，SSE target=3。
+Reuters-1200,A4_fixed_woMultiViewFusion,A0_best_res_biclr_refined,仅关闭多视图对齐融合，使用目标视图单视图锚图聚类；lambda 记录但不参与计算。,2000,1000,0.35,16,0,1e-08,8,1,1,1,只关融合；lambdaNotUsed=true，alignmentTime=0。
+WIKI,A1_fixed_woBIC,A0_best_res_biclr_refined,仅关闭 BIC 复杂度惩罚：lambdaBIC 从 4.5 改为 0；不重新搜索参数。,120,10000,0,30,0,1e-08,8,1,2,2,只改 lambdaBIC=0；targetView=2 是关闭惩罚后的证据选择结果。
+WIKI,A3_fixed_SSETarget,A0_best_res_biclr_refined,仅将目标视图选择准则从 BICUnitEvidence 改为 SSEMin；不重新搜索参数。,120,10000,4.5,30,0,1e-08,8,1,2,1,只改 target rule；A0/BIC target=2，SSE target=1。
+WIKI,A4_fixed_woMultiViewFusion,A0_best_res_biclr_refined,仅关闭多视图对齐融合，使用目标视图单视图锚图聚类；lambda 记录但不参与计算。,120,10000,4.5,30,0,1e-08,8,1,2,2,只关融合；lambdaNotUsed=true，alignmentTime=0。
+ForestTypes,A1_fixed_woBIC,A0_best_res_biclr_refined,仅关闭 BIC 复杂度惩罚：lambdaBIC 从 0.75 改为 0；不重新搜索参数。,200,1000,0,24,0,1e-08,10,1,3,3,只改 lambdaBIC=0；targetView=3 是关闭惩罚后的证据选择结果。
+ForestTypes,A3_fixed_SSETarget,A0_best_res_biclr_refined,仅将目标视图选择准则从 BICUnitEvidence 改为 SSEMin；不重新搜索参数。,200,1000,0.75,24,0,1e-08,10,1,3,3,只改 target rule；A0/BIC target=3，SSE target=3。
+ForestTypes,A4_fixed_woMultiViewFusion,A0_best_res_biclr_refined,仅关闭多视图对齐融合，使用目标视图单视图锚图聚类；lambda 记录但不参与计算。,200,1000,0.75,24,0,1e-08,10,1,3,3,只关融合；lambdaNotUsed=true，alignmentTime=0。
+Caltech256,A1_fixed_woBIC,A0_best_res_biclr_refined,仅关闭 BIC 复杂度惩罚：lambdaBIC 从 3 改为 0；不重新搜索参数。,200,1000,0,120,0,1e-08,3,1,3,3,只改 lambdaBIC=0；targetView=3 是关闭惩罚后的证据选择结果。
+Caltech256,A3_fixed_SSETarget,A0_best_res_biclr_refined,仅将目标视图选择准则从 BICUnitEvidence 改为 SSEMin；不重新搜索参数。,200,1000,3,120,0,1e-08,3,1,3,1,只改 target rule；A0/BIC target=3，SSE target=1。
+Caltech256,A4_fixed_woMultiViewFusion,A0_best_res_biclr_refined,仅关闭多视图对齐融合，使用目标视图单视图锚图聚类；lambda 记录但不参与计算。,200,1000,3,120,0,1e-08,3,1,3,3,只关融合；lambdaNotUsed=true，alignmentTime=0。

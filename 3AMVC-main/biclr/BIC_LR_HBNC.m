@@ -68,7 +68,8 @@ while ~isempty(pendingNodes)
         nextLeafPos = numel(leafNodes) + 1;
         leafNodes{nextLeafPos, 1} = currentIdx;
         leafDepths(nextLeafPos, 1) = currentDepth;
-        leafScores(nextLeafPos, 1) = -inf;
+        % 该节点未经过候选分裂评分，使用 NaN 区分“未评估”和“统计证据极弱”。
+        leafScores(nextLeafPos, 1) = NaN;
         leafReasons{nextLeafPos, 1} = '达到 maxAnchors 安全上限，停止继续分裂。';
         if options.verbose
             fprintf('[BIC-LR] 节点样本数=%d，因达到锚点上限而停止。\n', numel(currentIdx));

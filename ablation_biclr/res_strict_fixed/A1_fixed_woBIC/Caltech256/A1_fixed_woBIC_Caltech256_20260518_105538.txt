@@ -1,0 +1,33 @@
+fixed-parameter strict ablation 结果摘要
+method=A1_fixed_woBIC
+dataset=Caltech256
+fixedFrom=A0_best_res_biclr_refined
+changedOnly=仅关闭 BIC 复杂度惩罚：lambdaBIC 从 3 改为 0；不重新搜索参数。
+beta=200
+lambda=1000
+lambdaBIC=0
+minNodeSize=120
+numRuns=3
+seed=1
+targetView=3
+A0_targetView=3
+BIC_targetView=3
+SSE_targetView=1
+anchorCounts=[202 193 189 197]
+avgAnchors=195.250000
+acceptedSplits=[201 192 188 196]
+rejectedSplits=[202 193 189 197]
+meanLeafSize=[151.52 158.585 161.942 155.365]
+maxDepth=[14 11 10 13]
+ACC_mean=0.314013, ACC_std=0.002845, ACC_best=0.318032
+NMI_mean=0.544446, NMI_std=0.002646, NMI_best=0.540836
+AR_mean=0.213293, AR_std=0.003414, AR_best=0.218106
+anchorTime=0.000000
+alignmentTime=130.117961
+modelTime=130.117961
+evalTime=21.447649
+totalTime=157.509734
+lambdaNotUsed=0
+useMultiViewFusion=1
+cacheHit=[true true true true]
+notes=fixed-parameter strict ablation；参数来自 A0 best；不执行 grid search；仅通过 lambdaBIC=0 关闭 BIC 复杂度惩罚，目标视图选择规则保持 A0 的 BICUnitEvidence 口径。

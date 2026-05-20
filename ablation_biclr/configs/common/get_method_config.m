@@ -49,8 +49,7 @@ switch methodName
         config.methodConfig.preferA0AnchorCache = true;
     case 'A2_woLR_OriginalHBNC_Bridge'
         error('get_method_config:A2NotImplemented', ...
-            ['A2 is intentionally not implemented in this ablation framework. ' ...
-             'It will be handled using the original 3AMVC GitHub code and the paper/supplement results.']);
+            ['A2 当前不在消融框架中实现，将使用原始 3AMVC 代码及论文/补充材料结果处理。']);
     otherwise
         error('get_method_config:UnknownMethod', ...
             '未知消融方法：%s。当前仅支持 A0_Full_Reference、A1_woBIC_Joint、A3_SSETarget、A4_woMultiViewFusion。', ...
@@ -108,5 +107,7 @@ switch config.methodName
             * numel(config.lambdaList) * numel(config.lambdaBICList) ...
             * numel(config.minNodeSizeList);
         config.gridSource = [config.gridSource '；A4 Caltech256 消融网格按已有结果收缩为 36 组。'];
+    otherwise
+        % A0_Full_Reference 及其他方法不收缩网格，保持原始完整搜索空间。
 end
 end

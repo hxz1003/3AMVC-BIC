@@ -44,6 +44,7 @@ else
     res_neighbor = Clustering8Measure(Y, label_neighbor);
 end
 
+% 兼容旧缓存或外部直接构造的 info；正常路径下 BIC_LR_HBNC 已写入该字段。
 if ~isfield(info, 'viewEvidence') || ~isfield(info.viewEvidence, 'qualityScore')
     info.viewEvidence = biclr_view_evidence(X0, object, info.anchorSizes, info.options);
 end

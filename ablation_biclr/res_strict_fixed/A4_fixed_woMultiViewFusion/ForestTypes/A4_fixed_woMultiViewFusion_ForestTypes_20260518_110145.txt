@@ -1,0 +1,33 @@
+fixed-parameter strict ablation 结果摘要
+method=A4_fixed_woMultiViewFusion
+dataset=ForestTypes
+fixedFrom=A0_best_res_biclr_refined
+changedOnly=仅关闭多视图对齐融合，使用目标视图单视图锚图聚类；lambda 记录但不参与计算。
+beta=200
+lambda=1000
+lambdaBIC=0.75
+minNodeSize=24
+numRuns=10
+seed=1
+targetView=3
+A0_targetView=3
+BIC_targetView=3
+SSE_targetView=3
+anchorCounts=[17 17 16]
+avgAnchors=16.666667
+acceptedSplits=[16 16 15]
+rejectedSplits=[17 17 16]
+meanLeafSize=[30.7647 30.7647 32.6875]
+maxDepth=[7 7 7]
+ACC_mean=0.303442, ACC_std=0.007208, ACC_best=0.313576
+NMI_mean=0.013120, NMI_std=0.003526, NMI_best=0.019585
+AR_mean=0.006486, AR_std=0.003098, AR_best=0.011928
+anchorTime=0.000000
+alignmentTime=0.000000
+modelTime=0.099347
+evalTime=0.073750
+totalTime=0.212788
+lambdaNotUsed=1
+useMultiViewFusion=0
+cacheHit=[true true true]
+notes=fixed-parameter strict ablation；参数来自 A0 best；不执行 grid search；仅关闭多视图对齐融合，lambda 保存但不参与计算，alignmentTime 记为 0。

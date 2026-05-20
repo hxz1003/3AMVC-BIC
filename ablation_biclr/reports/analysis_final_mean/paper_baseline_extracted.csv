@@ -1,0 +1,6 @@
+Dataset,Samples,Clusters,Views,ACC,NMI,AR,Purity,Fscore,PaperBaselineView,HBNCAnchorCounts,Source
+ForestTypes,523,4,3,0.7984,0.5397,NaN,NaN,0.6752,3,[10 16 20],Paper reported 3AMVC
+Reuters-1200,1200,6,5,0.5734,0.3316,NaN,NaN,0.4061,5,[62 48 45 13 53],Paper reported 3AMVC
+Mfeat,2000,10,2,0.8737,0.824,NaN,NaN,0.7986,1,[54 64],Paper reported 3AMVC
+Caltech256,30607,256,4,0.1023,0.321,NaN,NaN,0.0792,3,[48 67 62 45],Paper reported 3AMVC; reference only for current Caltech256
+VGGFace2,36287,100,4,NaN,NaN,NaN,NaN,NaN,NaN,,Paper dataset setting

@@ -1,0 +1,33 @@
+fixed-parameter strict ablation 结果摘要
+method=A3_fixed_SSETarget
+dataset=WIKI
+fixedFrom=A0_best_res_biclr_refined
+changedOnly=仅将目标视图选择准则从 BICUnitEvidence 改为 SSEMin；不重新搜索参数。
+beta=120
+lambda=10000
+lambdaBIC=4.5
+minNodeSize=30
+numRuns=8
+seed=1
+targetView=1
+A0_targetView=2
+BIC_targetView=2
+SSE_targetView=1
+anchorCounts=[15 35]
+avgAnchors=25.000000
+acceptedSplits=[14 34]
+rejectedSplits=[15 35]
+meanLeafSize=[191.067 81.8857]
+maxDepth=[6 11]
+ACC_mean=0.471040, ACC_std=0.014967, ACC_best=0.486392
+NMI_mean=0.424977, NMI_std=0.021008, NMI_best=0.442079
+AR_mean=0.318938, AR_std=0.019580, AR_best=0.326596
+anchorTime=0.474263
+alignmentTime=1.686558
+modelTime=1.686558
+evalTime=0.377601
+totalTime=2.579256
+lambdaNotUsed=0
+useMultiViewFusion=1
+cacheHit=[false false]
+notes=fixed-parameter strict ablation；参数来自 A0 best；不执行 grid search；仅将目标视图选择准则改为 SSEMin，同时保存 A0/BIC targetView 与 SSE targetView。

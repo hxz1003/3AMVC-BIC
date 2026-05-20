@@ -1,0 +1,33 @@
+fixed-parameter strict ablation 结果摘要
+method=A3_fixed_SSETarget
+dataset=Reuters-1200
+fixedFrom=A0_best_res_biclr_refined
+changedOnly=仅将目标视图选择准则从 BICUnitEvidence 改为 SSEMin；不重新搜索参数。
+beta=2000
+lambda=1000
+lambdaBIC=0.35
+minNodeSize=16
+numRuns=8
+seed=1
+targetView=3
+A0_targetView=1
+BIC_targetView=1
+SSE_targetView=3
+anchorCounts=[41 42 47 38 47]
+avgAnchors=43.000000
+acceptedSplits=[40 41 46 37 46]
+rejectedSplits=[41 42 47 38 47]
+meanLeafSize=[29.2683 28.5714 25.5319 31.5789 25.5319]
+maxDepth=[12 15 14 15 23]
+ACC_mean=0.582396, ACC_std=0.039474, ACC_best=0.627500
+NMI_mean=0.340780, NMI_std=0.019572, NMI_best=0.370235
+AR_mean=0.293979, AR_std=0.029759, AR_best=0.332959
+anchorTime=0.000000
+alignmentTime=1.300346
+modelTime=1.300346
+evalTime=0.120616
+totalTime=1.669471
+lambdaNotUsed=0
+useMultiViewFusion=1
+cacheHit=[true true true true true]
+notes=fixed-parameter strict ablation；参数来自 A0 best；不执行 grid search；仅将目标视图选择准则改为 SSEMin，同时保存 A0/BIC targetView 与 SSE targetView。

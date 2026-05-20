@@ -9,10 +9,10 @@ seed = 1;  % 固定随机种子；用于锚点缓存键和 KMeans 重复评价�
 rng(seed, 'twister');  % 初始化 MATLAB 随机数流，避免不同会话中的 KMeans 初始化差异。
 
 config = struct();  % 创建配置结构体，后续字段会传入 run_biclr_grid_search。
-config.betaList = [80 100 120 160 200];  % 粗搜最优 beta=100 且位于粗搜上界附近，向更大 beta 扩展并保留 80/100 邻域。
-config.lambdaList = [10 30 100 300 1000];  % 粗搜最优 lambda=100，但 lambda=10/1000 进入前四，精细搜索保留两端并加入 30/300 过渡点。
-config.lambdaBICList = [0.2 0.35 0.5 0.75 1];  % 粗搜最优 lambdaBIC=0.5 位于下界，向更弱惩罚 0.2/0.35 扩展并保留 0.75/1 复核稳定性。
-config.minNodeSizeList = [16 20 24 28 32];  % 粗搜最优 minNodeSize=20 位于上界，向更保守分裂方向扩展到 24/28/32。
+config.betaList = [10 50 100 150 200];  % 200326 结果中 bestSummary/bestUpper 落在 beta=10，bestMean 落在 beta=100，同时向 200 复核高侧。
+config.lambdaList = [10 30 100 300 1000];  % 高值覆盖 lambda=10、100 和 1000，加入 30/300 检查对齐强度过渡区。
+config.lambdaBICList = [0.5 0.75 1 1.5 2];  % bestSummary 在 0.5，bestMean 在 1，bestUpper 在 2，细化三者之间的惩罚强度。
+config.minNodeSizeList = [5 10 16 20 24];  % bestUpper 在 5，bestSummary 在 10，bestMean 在 20，保留这些节点规模并向 24 小幅外扩。
 config.anchorOptions = struct( ...  % BIC-LR 锚点生成的固定工程参数，和 lambdaBIC/minNodeSize 网格共同决定锚点。
     'tauSplit', 0, ...  % 接受分裂的得分阈值；BIC-LR 得分必须大于该值才继续二分，0 表示只接受正收益分裂。
     'epsVar', 1e-8, ...  % 方差数值保护项；避免节点 SSE 极小时对数似然出现 log(0) 或数值不稳定。
@@ -43,10 +43,12 @@ bestMeanMeanMetrics = results.bestMean.evalMeanMetrics;  % 读取“平均 ACC�
 bestMeanStdMetrics = results.bestMean.evalStdMetrics;  % 读取“平均 ACC”选优结果的重复评价标准差。
 
 fprintf('ForestTypes 精细搜索完成。固定随机种子=%d。\n', seed);
-fprintf(['粗搜参考：bestMean beta=100，lambda=100，lambdaBIC=0.5，minNodeSize=20，' ...
-    'ACC=0.8005±0.0113，NMI=0.5218，AR=0.5416。\n']);
-fprintf(['粗搜第二梯队参考：beta=100，lambda=1000，lambdaBIC=1，minNodeSize=20，' ...
-    'ACC=0.7871±0.0162，NMI=0.5025，AR=0.5154。\n']);
+fprintf(['粗搜参考 bestMean：beta=100，lambda=1000，lambdaBIC=1，minNodeSize=20，' ...
+    'ACC=0.7610±0.0016，NMI=0.4978。\n']);
+fprintf(['粗搜参考 bestSummary：beta=10，lambda=10，lambdaBIC=0.5，minNodeSize=10，' ...
+    'summaryACC=0.8069，ACC=0.7259±0.0588。\n']);
+fprintf(['粗搜参考 bestUpper：beta=10，lambda=100，lambdaBIC=2，minNodeSize=5，' ...
+    'ACC=0.7014±0.1004，summaryACC=0.7935。\n']);
 fprintf(['按 ACC 均值+标准差最高：beta=%g，lambda=%g，lambdaBIC=%g，minNodeSize=%d，' ...
     'ACC=%.4f±%.4f，NMI=%.4f±%.4f，AR=%.4f±%.4f，summaryACC=%.4f\n'], ...
     results.bestUpper.beta, results.bestUpper.lambda, results.bestUpper.lambdaBIC, ...

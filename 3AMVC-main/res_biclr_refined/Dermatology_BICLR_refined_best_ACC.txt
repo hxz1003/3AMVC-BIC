@@ -1,0 +1,81 @@
+BIC-LR 精细搜索最优 ACC 结果
+
+【一、按重复评价均值+标准差上界 ACC 最高】
+数据集：Dermatology
+来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Dermatology_BICLR_grid_20260519_202909.mat
+选择准则：ACC
+选择口径：按重复评价均值+标准差上界
+beta=100
+lambda=10000
+lambdaBIC=1.5
+minNodeSize=24
+tauSplit=0
+epsVar=1e-08
+randomSeed=1
+numRuns=10
+kmeansReplicates=4
+evalSummaryMode=bestacc
+bestEvalRun=9
+bestEvalSeed=9
+anchorCounts=[12 10]
+targetView=1
+anchorQualityMethod=BICUnitEvidenceGain
+anchorEvidenceGain=[1.23469 0.416583]
+重复评价均值±标准差：
+ACC=0.886872 ± 0.074064
+NMI=0.844218 ± 0.056054
+Purity=0.926816 ± 0.030568
+Fscore=0.843078 ± 0.085098
+重复评价逐指标范围：
+ACC=[0.762570, 0.960894]
+NMI=[0.763064, 0.905679]
+Purity=[0.888268, 0.960894]
+Fscore=[0.730648, 0.934098]
+选优汇总指标：
+summaryACC=0.960894
+summaryNMI=0.905679
+summaryPurity=0.960894
+summaryFscore=0.934098
+bestRun指标：ACC=0.960894，NMI=0.905679，Purity=0.960894，Fscore=0.934098
+总耗时=297.49s
+缓存键=Dermatology_raw_view1_BICLR_lamBIC1p5_minNode24_tau0_eps1ep08_seed1_rmClutter0_capall, Dermatology_raw_view2_BICLR_lamBIC1p5_minNode24_tau0_eps1ep08_seed1_rmClutter0_capall
+
+【二、按重复评价平均 ACC 最高】
+数据集：Dermatology
+来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Dermatology_BICLR_grid_20260519_202909.mat
+选择准则：ACC
+选择口径：按重复评价平均
+beta=50
+lambda=10000
+lambdaBIC=2
+minNodeSize=24
+tauSplit=0
+epsVar=1e-08
+randomSeed=1
+numRuns=10
+kmeansReplicates=4
+evalSummaryMode=bestacc
+bestEvalRun=9
+bestEvalSeed=9
+anchorCounts=[12 8]
+targetView=1
+anchorQualityMethod=BICUnitEvidenceGain
+anchorEvidenceGain=[1.18576 0.391094]
+重复评价均值±标准差：
+ACC=0.894134 ± 0.057496
+NMI=0.846159 ± 0.052516
+Purity=0.923184 ± 0.028575
+Fscore=0.842541 ± 0.070764
+重复评价逐指标范围：
+ACC=[0.807263, 0.963687]
+NMI=[0.780794, 0.918696]
+Purity=[0.893855, 0.963687]
+Fscore=[0.757840, 0.938918]
+选优汇总指标：
+summaryACC=0.963687
+summaryNMI=0.918696
+summaryPurity=0.963687
+summaryFscore=0.938918
+bestRun指标：ACC=0.963687，NMI=0.918696，Purity=0.963687，Fscore=0.938918
+总耗时=297.49s
+缓存键=Dermatology_raw_view1_BICLR_lamBIC2_minNode24_tau0_eps1ep08_seed1_rmClutter0_capall, Dermatology_raw_view2_BICLR_lamBIC2_minNode24_tau0_eps1ep08_seed1_rmClutter0_capall

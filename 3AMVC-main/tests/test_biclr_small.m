@@ -62,3 +62,30 @@ verifyEqual(testCase, evalInfo.summaryMode, 'bestacc');
 verifyEqual(testCase, bestMetric, evalInfo.bestRunMetrics, 'AbsTol', 1e-12);
 verifyEqual(testCase, bestMetric(1), max(evalInfo.allMetrics(:, 1)), 'AbsTol', 1e-12);
 end
+
+function testAlignedSimilarityWeightedColumns(testCase)
+rootDir = fileparts(fileparts(mfilename('fullpath')));
+addpath(genpath(rootDir));
+
+Zbase = [0.80 0.75 0.10 0.10 0.20; ...
+    0.15 0.20 0.80 0.75 0.20; ...
+    0.05 0.05 0.10 0.15 0.60];
+Zview = [0.90 0.85 0.05 0.10 0.25; ...
+    0.10 0.15 0.95 0.90 0.75];
+verifyEqual(testCase, sum(Zbase, 1), ones(1, size(Zbase, 2)), 'AbsTol', 1e-12);
+verifyEqual(testCase, sum(Zview, 1), ones(1, size(Zview, 2)), 'AbsTol', 1e-12);
+
+[Sfused, T, info] = aligned({Zbase, Zview}, 10, 1);
+
+verifySize(testCase, Sfused, size(Zbase));
+verifySize(testCase, T{2}, [size(Zbase, 1), size(Zview, 1)]);
+verifyTrue(testCase, all(isfinite(Sfused(:))), '融合锚图不应出现 NaN 或 Inf。');
+verifyGreaterThanOrEqual(testCase, min(Sfused(:)), -1e-12, '融合锚图不应出现明显负值。');
+verifyEqual(testCase, sum(Sfused, 1), ones(1, size(Sfused, 2)), 'AbsTol', 1e-8, ...
+    '融合锚图应保持样本列归一化。');
+verifyEqual(testCase, info.alignmentMethod, 'SimilarityWeightedAnchorGraphColumns');
+verifyEqual(testCase, info.pairInfo{2}.weightedAlignment.methodName, ...
+    'SimilarityWeightedAnchorGraphColumns');
+verifyGreaterThan(testCase, info.pairInfo{2}.weightedAlignment.addedCoverageEdges, 0, ...
+    '非基准锚点更少时应为未覆盖基准锚点补充相似度边。');
+end

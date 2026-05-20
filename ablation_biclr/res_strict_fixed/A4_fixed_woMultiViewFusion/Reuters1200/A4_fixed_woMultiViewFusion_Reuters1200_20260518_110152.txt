@@ -1,0 +1,33 @@
+fixed-parameter strict ablation 结果摘要
+method=A4_fixed_woMultiViewFusion
+dataset=Reuters-1200
+fixedFrom=A0_best_res_biclr_refined
+changedOnly=仅关闭多视图对齐融合，使用目标视图单视图锚图聚类；lambda 记录但不参与计算。
+beta=2000
+lambda=1000
+lambdaBIC=0.35
+minNodeSize=16
+numRuns=8
+seed=1
+targetView=1
+A0_targetView=1
+BIC_targetView=1
+SSE_targetView=3
+anchorCounts=[41 42 47 38 47]
+avgAnchors=43.000000
+acceptedSplits=[40 41 46 37 46]
+rejectedSplits=[41 42 47 38 47]
+meanLeafSize=[29.2683 28.5714 25.5319 31.5789 25.5319]
+maxDepth=[12 15 14 15 23]
+ACC_mean=0.615625, ACC_std=0.012793, ACC_best=0.631667
+NMI_mean=0.369331, NMI_std=0.008347, NMI_best=0.381934
+AR_mean=0.323010, AR_std=0.014186, AR_best=0.342708
+anchorTime=0.000000
+alignmentTime=0.000000
+modelTime=0.192274
+evalTime=0.123396
+totalTime=0.567281
+lambdaNotUsed=1
+useMultiViewFusion=0
+cacheHit=[true true true true true]
+notes=fixed-parameter strict ablation；参数来自 A0 best；不执行 grid search；仅关闭多视图对齐融合，lambda 保存但不参与计算，alignmentTime 记为 0。

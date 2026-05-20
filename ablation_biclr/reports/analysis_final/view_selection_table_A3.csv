@@ -1,0 +1,6 @@
+Dataset,BIC_TargetView,SSE_TargetView,Agreement,BIC_Evidence_PerView,SSE_PerView
+Mfeat,1,1,1,"0.3522;0.3261",NaN
+Reuters-1200,1,3,0,"0.0221;0.0194;0.0190;0.0195;0.0155",NaN
+WIKI,2,1,0,"0.1303;0.4766",NaN
+ForestTypes,3,3,1,"0.3185;0.2901;0.3702",NaN
+Caltech256,3,1,0,"0.1390;0.0812;0.1823;0.0617",NaN

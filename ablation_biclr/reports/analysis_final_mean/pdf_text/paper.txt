@@ -1,0 +1,765 @@
+                                                                                                                               PDF Download
+                                                                                                                               3664647.3681273.pdf
+                                                                                                                               15 March 2026
+                                                                                                                               Total Citations: 8
+                                                                                                                               Total Downloads: 3125
+    .
+    .
+        Latest updates: hps://dl.acm.org/doi/10.1145/3664647.3681273
+
+
+
+
+                                                                                                                               .
+                                                                                                                               .
+                                                                                                                     Published: 28 October 2024
+        .
+        .
+                                                                                                                     .
+    RESEARCH-ARTICLE
+
+
+
+
+                                                                                                                     .
+                                                                                                                     Citation in BibTeX format
+    Automatic and Aligned Anchor Learning Strategy for Multi-View
+
+
+
+
+                                                                                                                     .
+                                                                                                                     .
+                                                                                                                     MM '24: The 32nd ACM International
+    Clustering                                                                                                       Conference on Multimedia
+                                                                                                                     October 28 - November 1, 2024
+    HUIMIN MA, National University of Defense Technology China, Changsha, Hunan, China                               Melbourne VIC, Australia
+
+
+
+
+                                                                                                                     .
+    .
+                                                                                                                     .
+    SIWEI WANG                                                                                                       Conference Sponsors:
+                                                                                                                     SIGMM
+    .
+    SHENGJU YU, National University of Defense Technology China, Changsha, Hunan, China
+    .
+    SUYUAN LIU, National University of Defense Technology China, Changsha, Hunan, China
+    .
+    JUN-JIE HUANG, National University of Defense Technology China, Changsha, Hunan, China
+    .
+    HUIJUN WU, National University of Defense Technology China, Changsha, Hunan, China
+    .
+    View all
+    .
+    .
+    Open Access Support provided by:
+    .
+    National University of Defense Technology China
+    .
+                                                                 MM '24: Proceedings of the 32nd ACM International Conference on Multimedia (October 2024)
+                                                                                                                     hps://doi.org/10.1145/3664647.3681273
+                                                                                                                                        ISBN: 9798400706868
+.
+Automatic and Aligned Anchor Learning Strategy for Multi-View
+                         Clustering
+                       Huimin Ma                                                     Siwei Wang∗                                             Shengju Yu
+           mahuimin16@nudt.edu.cn                                     Intelligent Game and Decision Lab                                      Suyuan Liu
+          National University of Defense                                         Beijing, China                                   National University of Defense
+                   Technology                                                                                                              Technology
+                Changsha, China                                                                                                         Changsha, China
+
+                    Jun-Jie Huang∗                                                  Xinwang Liu∗                                                En Zhu
+                      Huijun Wu                                          National University of Defense                           National University of Defense
+         National University of Defense                                           Technology                                               Technology
+                  Technology                                                   Changsha, China                                          Changsha, China
+               Changsha, China
+
+ABSTRACT                                                                                               KEYWORDS
+Multi-View Clustering (MVC) commonly utilizes the anchor tech-                                         Multi-view Clustering, Large-scale Clustering, Anchor Graph Clus-
+nique to mitigate the computational complexity. Existing methods                                       tering
+generally assume a pre-selection of anchors to facilitate subsequent
+clustering tasks. However, the determination of the optimal number                                     ACM Reference Format:
+of anchors is often non-trivial and necessitates their treatment as a                                  Huimin Ma, Siwei Wang, Shengju Yu, Suyuan Liu, Jun-Jie Huang, Huijun Wu,
+tunable parameter, incurring additional computational overhead.                                        Xinwang Liu, and En Zhu. 2024. Automatic and Aligned Anchor Learning
+                                                                                                       Strategy for Multi-View Clustering. In Proceedings of the 32nd ACM Interna-
+Moreover, it is not reasonable to assume an identical number of
+                                                                                                       tional Conference on Multimedia (MM ’24), October 28-November 1, 2024, Mel-
+anchors across all views, as this assumption restricts the represen-
+                                                                                                       bourne, VIC, AustraliaProceedings of the 32nd ACM International Conference
+tational capacity of anchors in individual views. To address the                                       on Multimedia (MM’24), October 28-November 1, 2024, Melbourne, Australia.
+above issues, we propose a view adaptive anchor multi-view clus-                                       ACM, New York, NY, USA, 10 pages. https://doi.org/10.1145/3664647.3681273
+tering called Multi-view Clustering with Automatic and Aligned
+Anchor (3AMVC). We introduce a Hierarchical Bipartite Neighbor
+Clustering (HBNC) strategy to adaptively select a suitable number                                      1    INTRODUCTION
+of representative anchors in each view. Specifically, when the repre-
+sentative difference of anchors lies in a acceptable and satisfactory                                  Multi-View Clustering (MVC) [13, 45, 46, 52, 63] generally delves
+range, the HBNC process is halted and picks out the final anchors.                                     into the intricacies of the similarity relationships among sample
+Moreover, we propose an innovative anchor alignment strategy                                           pairs, and constructs a graph matrix that captures the underlying
+in response to the varying quantities of anchors across different                                      structure and relationships within the dataset, thereby enabling the
+views. This approach initially evaluates the quality of anchors on                                     accurate completion of the clustering task. MVC typically begins
+each view based on the intra-cluster distance criterion and then pro-                                  by meticulously constructing individual graph structures for each
+ceeds to align based on the view with the highest-quality anchors.                                     distinct view. Subsequently, these distinct graphs are synthesized
+The carefully organized experiments well validate the effectiveness                                    through a fusion process designed to extract a consensus graph with
+and strengthens of 3AMVC. The code and appendix of 3AMVC are                                           enhanced quality [8, 25, 42, 48]. For example, Kang et al. [8] unified
+available at https://github.com/mahuimin16/3AMVC.                                                      the exploration graph structure, fusion graph and spectral clustering
+                                                                                                       process in one step. Wang et al. [42] introduced rank constraints
+CCS CONCEPTS                                                                                           to individual graphs in each view, and then integrated these high-
+                                                                                                       quality graphs to obtain a clearer graph of the consensus clustering
+• Computing methodologies → Cluster analysis; Unsuper-                                                 structure. Wu et al. [48] proposed a voting model for extracting
+vised learning.                                                                                        neighbors across views, which can directly obtain clustering labels
+∗ Corresponding author                                                                                 by skipping the traditional spectral decomposition procedure.
+                                                                                                          Although numerous researches affirm the capability of MVC
+Permission to make digital or hard copies of all or part of this work for personal or
+classroom use is granted without fee provided that copies are not made or distributed                  in enhancing the clustering performance, the sheer scale of data
+for profit or commercial advantage and that copies bear this notice and the full citation              encountered in practical applications still remains a formidable
+on the first page. Copyrights for components of this work owned by others than the                     challenge [4, 33]. Traditional MVC methods, which necessitate the
+author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or
+republish, to post on servers or to redistribute to lists, requires prior specific permission          construction of graph matrices at a minimum cost of the square of
+and/or a fee. Request permissions from permissions@acm.org.                                            the sample size 𝑛, are rendered powerless in the face of large-scale
+MM ’24, October 28-November 1, 2024, Melbourne, VIC, Australia                                         datasets [7, 9, 61]. The anchor graph strategy [18, 34, 37, 38, 44,
+© 2024 Copyright held by the owner/author(s). Publication rights licensed to ACM.
+ACM ISBN 979-8-4007-0686-8/24/10                                                                       49, 55, 62, 63] can address the challenges posed by large-scale data
+https://doi.org/10.1145/3664647.3681273                                                                application scenarios. Its basic idea is to approximate the overall
+
+
+
+
+                                                                                                5045
+MM ’24, October 28-November 1, 2024, Melbourne, VIC, Australia                                                                          Huimin Ma et al.
+
+
+
+
+Figure 1: The framework of the traditional anchor alignment method (Left) and the proposed 3AMVC (Right). The traditional
+alignment framework fixes the same number of anchors 𝑚 for each view, and may choose a baseline view with poor quality of
+anchors. The proposed 3AMVC method adaptively selects anchors of superior quality and accomplishes the alignment task
+utilizing the baseline view that demonstrates the most exemplary performance.
+
+
+sample using 𝑚 anchors on each view. Obviously, the consensus an-                      In this paper, we propose a general multi-view automatic anchor
+chor graph has a significant impact on performance. Consequently,                  graph fusion framework termed Automatic and Aligned Anchor
+a multitude of studies are dedicated to exploring the selection and                for Multi-view Clustering (3AMVC). Specifically, we propose a Hi-
+fusion processes of anchors, aiming to enhance the quality of the                  erarchical Bipartite Neighbor Clustering (HBNC) method, which
+consensus anchor graph [38, 43, 50, 59, 63]. K-means becomes the                   can complete clustering without specifying the number of clusters,
+mainstream anchor generation method because of its linear com-                     so as to automatically obtain high-quality anchors on each view.
+plexity and the ability to preserve the inherent characteristics of                Then, we improve the alignment method of Wang et al. [43], so that
+the clustering structure. Traditional methods such as [50, 63] use                 it can explore the similarity relationship of anchors between two
+K-means to select anchors on each view and then fuse them. Sun et                  views when the number of anchors in each view is inconsistent.
+al. [38] employed the direct optimization of the consensus anchor                  Further, we record the similarity relationship between the anchors
+matrix, replacing the process of individual view optimization fol-                 and the samples during the process of automatically anchor se-
+lowed by the fusion of anchor matrices. Wang et al. [43] identified                lection, and use it to represent the quality of the anchor graph of
+the Anchor-Unaligned Problem (AUP), and performed extensive                        the view, so as to determine the optimal view before alignment.
+experiments to demonstrate that the alignment of anchors exerts a                  Figure. 1 shows the difference between our method and the tra-
+profound influence on the performance of clustering.                               ditional anchor alignment framework. The traditional alignment
+    Despite the effectiveness in improving the quality of anchor                   framework fails to discern and exploit anchors of superior quality
+graph and the adaptability of clustering tasks, current methods col-               within a single view, and is more likely to perform alignment tasks
+lectively face an limitation, i.e., the selection of anchors necessitates          based on suboptimal views because it lacks a systematic evaluation
+supplementary procedures. The majority of existing approaches                      mechanism for the quality of the anchor graphs. While our method
+employ the correlation number of the cluster count 𝑘 [16, 41] or                   can automatically select better quality anchors on a single view
+the correlation number of the sample size 𝑛 [12, 34] to judiciously                and complete the alignment work based on the view with higher
+determine the optimal quantity of anchors. Even if the K-means                     anchor graph quality. We summarize the contributions as follows:
+method may preserve the clustering structure to a certain degree,
+the method of selecting tentative values struggles to approximate
+the optimal anchors, let alone random sampling. Additionally, al-                      • We propose a novel Hierarchical Bipartite Neighbor Clus-
+though Wang et al. has delved into establishing the correct corre-                       tering (HBNC) algorithm to identify and select high-quality
+spondence between anchors across views [43], it does not neces-                          anchors on a single view. It does not require a prerequisite
+sarily select the view with the highest quality anchor graph as the                      specification number of anchors and is capable of preserving
+reference for alignment. As far as we know, there exists no universal                    the inherent characteristics of data structures like K-means.
+framework capable of automatically selecting high-quality anchors                      • We design a general multi-view automatic anchor graph
+and aligning them based on the optimal view. This is largely because                     fusion framework termed Multi-view Clustering with Auto-
+that it is inherently a challenging problem to perform clustering                        matic and Aligned Anchor (3AMVC), which can align and
+with an unknown number of clusters on a single view.                                     fuse anchor graphs according to the view with highest qual-
+                                                                                         ity anchor graph when the number of anchors is inconsistent.
+
+
+
+
+                                                                            5046
+Automatic and Aligned Anchor Learning Strategy for Multi-View Clustering                               MM ’24, October 28-November 1, 2024, Melbourne, VIC, Australia
+
+
+
+
+Figure 2: The framework of 3AMVC. Firstly, HBNC is performed on each view to automatically select representative anchors.
+Secondly, select the baseline view based on the quality of the anchor graphs, and align the other anchor graphs with the baseline
+view. Finally, the aligned anchor graphs of other views are fused with the anchor graph of the baseline view.
+
+
+     • Extensive experiments on five benchmark datasets show the                           In the second step, the anchor graphs in each view are fused
+       effectiveness and efficiency of the proposed method. Com-                        through:
+       pared with the traditional alignment framework FMVACC,                                    min ∥𝛽𝑝 Z𝑝 − S∥ 2F, s.t. 𝜷 ≥ 0, 𝜷 ⊤ 1𝑣 = 1, S1𝑚 = 1𝑛 , (2)
+                                                                                                 𝜷,S
+       the proposed method has improved in clustering perfor-
+       mance efficiently.                                                               where S ∈ R𝑛×𝑚 is the fused anchor graph, 𝜷 ∈ R𝑣 is the weight
+                                                                                        coefficient which measures the impact of each view on the fused
+2 RELATED WORK                                                                          anchor graph, and 𝜷 ⊤ 1𝑣 = 1 ensures that the sum of weights is 1
+2.1 Multi-View Anchor Graph Clustering                                                  and satisfies constraint S1𝑚 = 1𝑛 .
+                                                                                           After spectral decomposition of the fusion anchor graph, K-
+Recently, due to the superior non-linear performance of multi-view
+                                                                                        means is performed on the left singular vector to obtain the final
+graph clustering, it has garnered increasingly extensive research
+                                                                                        clustering result. Multi-view anchor graph clustering can reduce
+attention [8, 13, 14, 23, 24, 26, 31, 39, 40, 47, 53, 54, 57]. However, the
+                                                                                        the time and space complexity to O (𝑣𝑚𝑛) and O (𝑛𝑚 2 ), respectively
+construction of a complete graph matrix requires a computational
+                                                                                        and effectively adapt to the large-scale data scenarios.
+complexity that is at least quadratic in the number of samples 𝑛,
+                                                                                           Although the existing approaches can well solve the problem of
+which often proves inadequate when confronted with large-scale
+                                                                                        large-scale multi-view clustering, they all encountered a common
+data scenarios. Therefore, many studies have turned to employ rep-
+                                                                                        problem, that is, the anchors are established before the optimiza-
+resentative anchors for the construction of anchor graphs instead
+                                                                                        tion process commences, hence the quality of these anchors plays
+of the complete graphs, which can effectively reduce the quadratic
+                                                                                        a pivotal role to the performance of the clustering. Most existing
+computational complexity to a linear correlation with the number
+                                                                                        methods take random sampling and K-means [9, 12] to select an-
+of samples [17, 25, 36, 38, 44, 56, 58].
+                                                                                        chors, however, both of which require a given number of anchors.
+   Specifically, multi-view anchor graph clustering basically fol-
+                                                                                        This prerequisite number of anchors then becomes a hyperparame-
+lows a two-step strategy of optimization-fusion. The first step is to
+                                                                                        ter which requires time for searching.
+optimize the anchor graph on each view as follows:
+        min ∥X𝑖 − Z𝑖 A𝑖 ∥ 2F + Ω (Z𝑖 ) , s.t. Z𝑖 ≥ 0, Z𝑖 1𝑚 = 1𝑛 ,         (1)
+                                                                                        2.2    Anchor-Unaligned Problem
+          Z𝑖
+                                                                                        The concept of anchors gains traction in the realm of large-scale
+where Z𝑖 ∈ R𝑛×𝑚 and A𝑖 ∈ R𝑚×𝑑𝑖 is the anchor graph and the                              multi-view clustering. Wang et al. [43] have further identified a crit-
+anchor matrix of the 𝑖-th view respectively. Z𝑖 1𝑚 = 1𝑛 is a sum-to-                    ical, yet previously overlooked issue within the selection and fusion
+one constraint that ensures that the sum of the sample similarity                       method which is termed as Anchor-Unaligned Problem (AUP). An
+corresponding to the anchors equals 1.                                                  intuitive solution to AUP is to avoid random anchor sampling and
+
+
+
+
+                                                                                 5047
+MM ’24, October 28-November 1, 2024, Melbourne, VIC, Australia                                                                        Huimin Ma et al.
+
+
+                                                                                  The above formulation indicates that the anchor graphs in the
+                                                                              other views are aligned to the anchor graph in the 1-st view from
+                                                                              the feature and structure correspondence simultaneously. While
+                                                                              FMVACC addresses the cross-view alignment of anchors with dif-
+                                                                              ferent dimensions, it still falls short in thoroughly exploring view
+                                                                              with superior quality, hence it simplistically adopts the first view as
+                                                                              the baseline for alignment tasks. Should the anchor graph derived
+                                                                              from the 1-st view fail to capture an precise representation of the
+                                                                              underlying structure, and if the alignment between the anchor and
+                                                                              the sample is not close enough, then there exists a risk. Specifically,
+                                                                              it could lead to subsequent views aligning based on a flawed rela-
+                                                                              tionship. Furthermore, since the existing anchor graph clustering
+                                                                              methods all use the same number of anchors across views, FM-
+                                                                              VACC does not consider the scene where the number of anchors is
+                                                                              different across views, so it lacks the capability to effectively align
+Figure 3: The anchor selection strategy of BKHK and our                       disparate anchors.
+HBNC. (a) BKHK performs binary classification of samples
+which leads to suboptimal performance when the number                         2.3    Clustering without Knowing Cluster
+of samples across different classes is imbalanced. (b) Our                           Number
+method can flexibly select neighbors based on the distances
+                                                                              At present, the prevailing array of methods inherently assume the
+between samples, effectively addressing scenarios where the
+                                                                              number of clusters as a pre-defined parameter within the cluster-
+distribution of sample sizes across clusters is uneven. (c)
+                                                                              ing process. For instance, the K-means and 𝑘-NN methods, which
+Specifically, we evaluate the distance between the target sam-
+                                                                              are widely applied throughout clustering procedures [5, 15, 19–
+ple and other samples within the sample range to be clus-
+                                                                              22, 32, 60], are both derived from the premise of a predefined num-
+tered, and find the optimal threshold.
+                                                                              ber of clusters 𝑘. Moreover, the task of selecting representative an-
+                                                                              chors on a single view is essentially clustering without knowing the
+                                                                              number of clusters. An effective solution is to use other evaluation
+to select the same anchor set across views as in [11]. However, this
+                                                                              criteria instead of cluster number 𝑘. Hierarchical clustering [28, 29]
+approach restricts the model flexibility and will use the same set of
+                                                                              and density-based clustering [1, 10] are representative methods of
+anchors across various views. Both intuitively and existing studies
+                                                                              such solution. Hierarchical clustering gradually expands the cluster-
+have shown that learning more representative anchors can achieve
+                                                                              ing granularity based on distance measure, starting from the recent
+improved performance over random sampling. Another solution is
+                                                                              two samples clustered into one class, until all samples clustered
+to optimize the consensus anchors representing cross-view features
+                                                                              into one class, and the stopping condition is an appropriate number
+in a latent common-shared space [38]. Liu et al. [18] added con-
+                                                                              of clusters or a distance threshold. And density-based clustering
+straints to the consensus anchor graph, so that the connectivity of
+                                                                              generally complete clustering based on the density threshold. There
+the anchor graph equals to the number of clusters. Nonetheless, em-
+                                                                              are other methods that design models and propose new criteria to
+ploying projections within the common space will inevitably result
+                                                                              regulate samples within clusters [2, 6]. In summary, the aforemen-
+in the loss of unique, view-specific information. Consequently, the
+                                                                              tioned approaches are essentially provide criteria for the number
+strategic and flexible selection of anchors within a single view, cou-
+                                                                              of clusters, either in a directly or indirectly manner. Nevertheless,
+pled with a fusion process grounded in accurate correspondences,
+                                                                              ascertaining the optimal number of clusters based solely on the
+emerges as a superior solution to ensure clustering performance in
+                                                                              intrinsic characteristics of the dataset, without presupposing any
+large-scale scenarian.
+                                                                              artificial thresholds, presents a significantly more intricate chal-
+   Wang et al. [43] proposed a Fast Multi-View Anchor-Correspondence
+                                                                              lenge. Ronen et al. [35] incorporated a subclustering network based
+Clustering (FMVACC) method to solve AUP. Specifically, FMVACC
+                                                                              on the deep clustering frameowrk to ascertain an optimal number
+is to retain the feature and structure information of the anchor
+                                                                              of clusters 𝑘. While Menon et al. [27] proposed to reflect the ap-
+set for anchor matching. The optimization formulation can be ex-
+                                                                              propriate number of clusters by the drastic change of clustering
+pressed as:
+                                                                              scores. Aiming at the anchor selection, we prefer the clustering
+                 min ∥Z1 − Z𝑖 P∥ 2F + 𝜆∥G1 − P⊤ G𝑖 P∥ 2F,                     method without knowing either cluster number or other alternative
+                   P                                             (3)          indicators, whose computational complexity is affordable.
+                 s.t. P1 = 1, P⊤ 1 = 1, P ∈ {0, 1}𝑚×𝑚 ,
+
+where ∥Z1 −Z𝑖 P∥ 2F is the feature correspondence and ∥G1 −PG𝑖 P∥ 2F          3     THE PROPOSED METHOD
+is the structure correspondence. Moreover, 𝜆 is a parameter for               In this section, we introduce the method for selecting high-quality
+balancing two terms, G denotes the graph structure inside the                 anchors on a single view, and elaborate the alignment strategies of
+anchor set, Z is the respective anchor graph which represents the             these anchors in relation to the baseline view. Figure. 2 shows the
+similarities between the samples and the anchors in each view,                overall framework of our Multi-view Clustering with Automatic
+𝑖 ∈ {2, 3, ..., 𝑣 } represents the other views except the 1-st one.           and Aligned Anchor (3AMVC). Our method takes three steps: i) an
+
+
+
+
+                                                                       5048
+Automatic and Aligned Anchor Learning Strategy for Multi-View Clustering                                 MM ’24, October 28-November 1, 2024, Melbourne, VIC, Australia
+
+
+Adaptive Anchor Selection Module to select the appropriate anchors                       Algorithm 1 Bipartite neighbor clustering of the 𝑙-th layer
+on a single view, ii) a Cross-View Anchor Alignment Module to                            Input: Samples to be clustered Xl ∈ R𝑑 ×𝑛𝑙 .
+align the views based on the view with best quality of the anchor                         1: Randomly select a sample as the target sample x𝑖 .
+graph, and iii) finally performing fusion to the aligned views.                           2: Calculate the distance d𝑙 between all samples and the target sample.
+                                                                                          3: Sort the vector d𝑙 to get d̂𝑙 .
+3.1     Adaptive Anchor Selection Module                                                  4: Calculate the neighbors and the optimal threshold of the target sample
+The fundamental premise of our anchor concept is to effectively                              according to Eq. (6).
+                                                                                         Output: The neighbors and the optimal threshold of the target sample x𝑖 .
+address the challenges posed by large-scale data so as to make
+the computational complexity involved in the selection of anchors
+within a single view affordable. Balance K-means based Hierarchical
+                                                                                         target sample as the first cluster, and all other samples as the second
+K-means (BKHK) method [65] offers a novel approach by combin-
+                                                                                         cluster. We represent the proportion of each type of sample within
+ing the flexibility of hierarchical clustering with a relatively low
+                                                                                         the entire samples as 𝑝 1 and 𝑝 2 , as well as the average distance
+computational complexity, providing us with a fresh perspective
+                                                                                         between each cluster of samples and the target sample as 𝜇 1 and
+on tackling these challenges. However, BKHK imposes excessively
+                                                                                         𝜇2 . Then the inter-class error can be expressed as:
+stringent demands on the equalization performance of the dataset,
+and it specifies a termination condition based on the number of                                                       𝑝 1 𝑝 2 (𝜇1 − 𝜇2 ) 2 .                        (5)
+clusters in the hierarchical clustering process.                                            Our expectation for the optimal threshold is that it can make
+   Building upon the foundation of BKHK, we introduce an effec-                          the distance between samples in the cluster smaller and at the
+tive Hierarchical Bipartite Neighbor Clustering (HBNC) method                            same time the inter-class error larger. Therefore, the criterion for
+that enables it to better accommodate datasets with uneven intra-                        determining the optimal threshold can be formulated as follows:
+cluster sample sizes and to automatically determine the optimal                                                              𝜇1
+termination point. Figure. 3 shows the specific process of BKHK                                                min                        ,                (6)
+                                                                                                                𝑘𝑖 𝑝 1 𝑝 2 (𝜇 1 − 𝜇 2 ) 2
+and our HBNC. BKHK classifies all samples into two categories
+                                                                                         where 𝑘𝑖 is the number of samples in the first cluster with the target
+layer by layer based on the distance between samples, and finally
+                                                                                         sample.
+obtains 𝑘 clusters with balanced number of internal samples. How-
+                                                                                            Since the number of neighbors of the target sample is discrete
+ever, real data sets often do not follow the rules of intra-cluster
+                                                                                         and finite, constrained within {1, 2, ..., 𝑛𝑙 }, the value of Eq. (6) is also
+equilibrium, and BKHK will fail in such cases such as part (a) of
+                                                                                         discrete and finite. Consequently, by determining the 𝑘𝑖 neighbors
+Figure. 3. In comparison, our method can determine the relevant
+                                                                                         of the target sample x𝑖 that can minimize the Eq. (6), we can obtain
+optimal threshold, so as to flexibly divide the samples inside and
+                                                                                         the optimal threshold 𝑇𝑖 = 𝑑𝑖 [𝑘𝑖 ] .
+outside the target cluster.
+                                                                                         3.1.2 How to determine the number of clusters?
+3.1.1 How to determine the optimal threshold?
+                                                                                            It is widely recognized that the closer the samples within a cluster
+    Intuitively, the relationships among samples within the same
+                                                                                         are to the clustering center, the more concentrated the distribution
+cluster should be markedly distinct from those between samples
+                                                                                         of samples in that cluster, and consequently, the more representative
+belonging to different clusters. As depicted in Figure 3 (c), there is
+                                                                                         the cluster center becomes. K-means clusters according to this
+a significant disparity in the distances between the target sample
+                                                                                         principle. For a specific cluster 𝑖, the problem can be expressed as:
+and the samples outside the cluster compared to those within its                                                      ∑︁
+own cluster.                                                                                                              ∥x 𝑗 − 𝜃𝑖 ∥ 22,                    (7)
+    Based on this principle, we design a new criterion for optimiz-                                                  x 𝑗 ∈Θ𝑖
+ing the optimal threshold to determine the neighbors of the tar-
+                                                                                         where Θ𝑖 denotes the 𝑖-th cluster, x 𝑗 ∈ Θ𝑖 represents its samples, 𝜃𝑖
+get sample in the range of sample to be clustered. Take the 𝑙-th
+                                                                                         denotes the center of the cluster and 𝜃𝑖 = 𝑐1𝑖 𝑐𝑗=1
+                                                                                                                                        Í𝑖
+                                                                                                                                             x 𝑗 with 𝑐𝑖 being
+layer clustering process as an example, we first randomly select
+                                                                                         the number of samples in this cluster.
+a target sample x𝑖 from 𝑛𝑙 samples to be clustered, and calcu-
+                                                                                            The proposed Hierarchical Bipartite Neighbor Clustering (HBNC)
+late the distance between the target sample and other samples
+                                                                                         algorithm introduces a new cluster through the binary classification
+denoted as d ∈ R𝑛𝑙 ×1 . After sorting d, we get the vector form as
+                                   ⊤                                                   task of each layer. Consequently, if our algorithm performs through
+d̂ = 𝑑𝑖 [1] , 𝑑𝑖 [2] , ..., 𝑑𝑖 [𝑛𝑙 ] . Our goal is to find an optimal thresh-
+                                                                                         𝐿 layers, then similar to K-means, the intra-cluster distance of all
+old 𝑇𝑖 related to the sample x𝑖 , so as to divide the nearest neighbors
+                                                                                         clusters in our algorithm is expressed as:
+of the target sample. The optimal threshold 𝑇𝑖 should satisfy the
+following condition:                                                                                                𝐿 ∑︁
+                                                                                                                   ∑︁
+                                                                                                                                 ∥x 𝑗 − 𝜃𝑖 ∥ 22 .                   (8)
+         𝑑𝑖 [1] ≤ 𝑑𝑖 [2] ≤ ...𝑑𝑖 [𝑘𝑖 ] ≤ 𝑇𝑖 ≤ 𝑑𝑖 [𝑘𝑖 +1] ... ≤ 𝑑𝑖 [𝑛𝑙 ] .   (4)                                    𝑖=1 x 𝑗 ∈Θ𝑖
+
+   In this paper, we design an ingenious formula to determine the                           Although our HBNC algorithm operates without a predeter-
+appropriate threshold 𝑇𝑖 . Inspired by the grayscale binarization in                     mined number of clusters, by effectively managing the stopping
+the field of image segmentation [30], we first introduce the concept                     criteria of the algorithm, we can halt the clustering process at an
+of inter-class error. Regardless of the layer in which it is performed,                  opportune moment, thereby ascertaining the appropriate number
+the clustering task at hand involves categorizing the samples into                       of clusters. The clustering result should lead to the centers of all
+two groups. For convenience, we consider the cluster containing the                      clusters being highly representative. Therefore, at the beginning of
+
+
+
+
+                                                                                  5049
+MM ’24, October 28-November 1, 2024, Melbourne, VIC, Australia                                                                                         Huimin Ma et al.
+
+
+Algorithm 2 Anchor selection stratrgy based on HBNC.                                        Table 1: Multi-view Datasets in our Experiments
+Input: Dataset X ∈ R𝑑 ×𝑛 .                                                                            Dataset        Size    Clusters       Views
+ 1: while Not converge do
+ 2:   Update the layer 𝑙.
+                                                                                                   ForestTypes       523         4                 3
+ 3:   Determine the range of samples to be clustered X𝑙 ∈ R𝑑 ×𝑛𝑙 .                                   Reuters         1200        6                 5
+ 4:   Complete the bipartite neighbor clustering of the 𝑙-th layer according                          MFeat          2000       10                 2
+      to Algorithm 1.                                                                              Caltech256       30607       256                4
+ 5:   Calculate the intra-distance of each cluster according to Eq. (7).                            VGGFace2        36287       100                4
+ 6: end while
+Output: Anchor quality according to Eq. (8) and the anchors Θ.                        addition, it is clear that under the same sample distribution, the
+                                                                                      more the number of anchors, the stronger the average representa-
+                                                                                      tion of each anchor. Considering the variability in the number of
+the clustering task at each layer, we select the range of the sample                  anchors selected for each view, relying on an average-based calcula-
+to be clustered based on the criterion that the distance between                      tion may inadvertently place views with fewer anchors at a relative
+the center and the sample within the cluster is maximized for the                     disadvantage. By applying a summation technique universally, the
+chosen cluster. It is imperative to avoid obtaining many cluster-                     representativeness of the anchors is effectively distributed among
+ing centers to represent outliers, and avoid huge differences in the                  all samples, making it a more advantageous strategy. Ultimately,
+value of Eq. (7) of each cluster. Here, at most one cluster center                    we select the view with the smallest value from Eq. (8), where the
+representing outliers is acceptable. Therefore, when a cluster is                     anchors exhibit the strongest representativeness and all samples
+with a sample size of 1 again or the target value of the Eq. (7) of all               are closer to their respective anchors, to serve as the baseline view.
+clusters tends to average, we terminate the algorithm and obtain a                    3.2.2 How to align anchor set with unequal number?
+more representative anchor set. The complete HBNC process ise                            According to Wang et al.[43], we can align the anchors in terms
+elaborated in Algorithm 2.                                                            of feature and structure by summing the values of the anchors in
+    As for the complexity of the algorithm, the computational com-                    different dimensions. In order to match the optimal view and our
+plexity of each layer of HBNC is to calculate the distance of all sam-                inconsistent number of anchors, our improved alignment method
+ples within the sample range of the layer, which equals to O (𝑛𝑙 𝑑).                  is expressed as follows:
+Consequently, the complexity of the whole HBNC is O ((𝑛 1 + 𝑛 2 +
+...𝑛𝐿 )𝑑), where 𝐿 is the number of layers. Relative to the first layer,                              min ∥Z𝑏 − Z𝑖 P∥ 2F + 𝜆∥G𝑏 − P⊤ G𝑖 P∥ 2F,
+                                                                                                       P                                                            (9)
+which processes the entire dataset of 𝑛 1 = 𝑛 entries, the computa-
+                                                                                                      s.t. P1 = 1, P⊤ 1 = 1, P ∈ {0, 1}𝑚𝑖 ×𝑚𝑏 ,
+tional complexity of the subsequent layers is significantly reduced.
+As such, the overall complexity of our HBNC algorithm can be                          where Z𝑏 ∈ R𝑛×𝑚𝑏 is the anchor graph of the baseline view, G𝑏
+denoted as O (𝑛𝑑).                                                                    and G𝑖 represent the inner graph structures of the baseline view
+                                                                                      and the 𝑖-th view. It is noteworthy that the matching matrix P here
+3.2     Cross-View Anchor Alignment Module                                            is specific for each view and can filter out the optimal anchors to
+The unequal number of anchors automatically selected on each                          match the baseline view.
+                                                                                                               𝑣
+                                                                                         After obtaining {P}𝑖=1,𝑖≠𝑏  , we can obtain the fused aligned an-
+view compels us to further explore one-to-many or many-to-one
+matching relationships, rather than being constrained by the strict                   chor graph based on the baseline view as:
+one-to-one matching framework. In addition, matching based on                                                                 𝑣
+                                                                                                                             ∑︁
+the view where the higher quality anchor set is located should bring                                    Z𝐴𝑙𝑖𝑔𝑛𝑒𝑑 = (Z𝑏 +              Z𝑖 P𝑖 )/𝑣.                  (10)
+better clustering performance.                                                                                              𝑖=1,𝑖≠𝑏
+                                                                                      Ultimately, by performing spectral decomposition on Z𝐴𝑙𝑖𝑔𝑛𝑒𝑑 ac-
+3.2.1 How to determine the baseline view for alignment?
+                                                                                      cording to Eq. (10), and subsequently applying K-means clustering
+   In the previous section, we propose a formulation in Eq. (8) to
+                                                                                      to its left singular values, the final clustering results are successfully
+simultaneously adeptly capture the relationship between the global
+                                                                                      derived.
+clustering center and the samples and reflect the representative per-
+formance of the clustering center essentially. In this subsection, we
+                                                                                      3.3    Complexity Analysis
+therefore employ Eq. (8) as a metric of anchor representativeness to
+assess the quality of the anchor graph for each individual view. In                       In terms of space complexity, our major memory costs are ma-
+                                                                                                    𝑣 ∈ R𝑚𝑖 ×𝑑𝑖 , {P } 𝑣
+                                                                                      trices {Θ𝑖 }𝑖=1                             𝑚 ×𝑚𝑏 , {Z } 𝑣 ∈ R𝑛×𝑚𝑖 .
+the process of devising anchor quality metrics for views, we discern                                                𝑖 𝑖=1,𝑖≠𝑏 ∈ R 𝑖          𝑖
+                                                                                                                                          Í𝑣 𝑖=1
+that the summation approach offers numerous advantages over the                       The space complexity of 3AMVC is O (𝑚𝑚𝑎𝑥 𝑑 + 𝑖=1          𝑚𝑖 𝑛 + 𝑚𝑏2 𝑣).
+mean-based formulations. Since our ultimate goal is to perform                        𝑚𝑚𝑎𝑥 is the largest number of anchors in all views. 𝑚𝑏 is the num-
+spectral clustering on the fusion anchor graph, when the distribu-                    ber of anchors in the baseline view. In large-scale scenarios, the
+tion of a certain type of samples forms a ring shape, it is preferable                main amount of computation is mainly the correlation term of 𝑛.
+that the selected anchors also follow a ring pattern, rather than at                  Therefore, the space complexity of 3AMVC is O (𝑛).
+the center of the ring. For the sample-center distance in the same                        As for time complexity, it consists of three steps. As mentioned
+cluster like Eq. (7), sum rather than average, can avoid the ring                     above, the time complexity of HBNC on a single view is O ((𝑛 1 +𝑛 2 +
+distribution of the samples associated with the selected anchor. In                                                                     𝑣 costs O (𝑛𝑚 𝑑 ).
+                                                                                      ...𝑛𝐿 )𝑑). In the alignment phase, updating { Z𝑖 }𝑖=1             𝑖 𝑖
+
+
+
+
+                                                                               5050
+Automatic and Aligned Anchor Learning Strategy for Multi-View Clustering                            MM ’24, October 28-November 1, 2024, Melbourne, VIC, Australia
+
+
+               𝑣 needs O (𝑛𝑚 𝑚 + 𝑚 𝑚 𝑑). Then the alignment
+Updating { Θ𝑖 }𝑖=1              𝑖 𝑏     𝑖 𝑏
+module costs O (𝑚𝑏2 𝑚𝑖 ). After obtaining the aligned and fused an-
+chor graph, SVD needs O (𝑛𝑚𝑏2 ). Consequently, the time complexity
+of our 3AMVC is approximately O (𝑛), which can better cope with
+large-scale data scenarios.
+
+4 EXPERIMENT
+4.1 Experiment Setting
+                                                                                                (a) ForestTypes                        (b) Caltech256
+We verify the effectiveness of our algorithm on five widely used
+multi-view benchmark datasets: ForestTypes, Reuters, MFeat, Cal-                     Figure 4: Sensitivity Analysis on ForestTypes and Caltech256
+tech256, and VGGFace2. The information of these datasets is listed                   with ACC metric.
+in Table 1. We compare 3AMVC with 8 state-of-the-art multi-
+view clustering methods: BMVC [64], LMVSC [9], FMCNOF [51],
+FPMVS-CAG [44], EOMSC-CA [18], FMVACC [43], UDBGL [3],
+and fastMICE [4].
+   We set their parameters within the recommended range for all
+comparison algorithms aforementioned. In the proposed method,
+we adjust 𝛽 to [10 −2, 1, 102 ], 𝜆 to [0, 10 −4, 10 −2, 1, 104 ]. To assess
+the clustering performance, we employ three well-used criterias,
+ACC, NMI and Fscore.
+
+4.2     Experimental Results                                                                (a) K-means on 1-st view               (b) HBNC on 1-st view
+Table. 2 reports the clustering results of other methods and our                     Figure 5: Visualization of selected anchor points on MFeat
+3AMVC on five benchmark datasets. The best results are marked                        dataset.
+in red, while the second-best results are marked in blue. According
+to these results, we have the following observations:
+     • Our method exceeds other algorithms in most indicators,                       secures a set of more representative anchor points without the need
+        or reaches a considerable level with other algorithms. In                    to predefine the number of clusters.
+        terms of the ACC metric, 3AMVC achieves improvements
+        of 0.69% (ForestTypes), 3.65% (Reuters),4.97% (MFeat) 12.29%                 4.5    Ablation Studies
+        (Catech256), and 13.17% (VGGFace2) respectively, when com-                   In order to illustrate the effectiveness of our automatic anchor se-
+        pared to the traditional alignment algorithm FMVACC.                         lection strategy and baseline view alignment strategy, we conduct
+     • On other datasets, we also obtain comparable results with                     ablation experiments on these two parts respectively. The experi-
+        the suboptimal algorithm, and it is worth noting that almost                 mental results are shown in Table 3. Methods that do not use either
+        all the algorithms compared require the pre-K-means process                  strategy are recorded as 3𝐴_𝑛𝑒𝑖𝑡ℎ𝑒𝑟 . 3𝐴_𝑤/𝑜_𝑆𝐴 means that the
+        to select the anchors, while our algorithm avoids the process                anchors are not automatically selected, and we use the K-means
+        of searching for the optimal number of anchors.                              method instead. 3𝐴_𝑤/𝑜_𝐴𝐵 stands for not aligning based on the
+                                                                                     baseline view, we align based on the first view uniformly. 3𝐴𝑀𝑉𝐶
+4.3     Parameter Sensitivity Analysis                                               means the complete algorithm. We conduct experiments under the
+Our experimental setup involves two hyperparameters, namely,                         best parameter settings of each dataset. It is worth noting that
+𝛽 and 𝜆. As shown in Figure. 4, we use the ACC metric to show                        since the MFeat dataset is also aligned based on view 1 under the
+the influence of two parameters on the clustering effect on two                      3AMVC method, we created the MFeat_test dataset, which replaces
+datasets: ForestTypes and Caltech256.                                                the view order and aligns it according to view 2 to complete the
+   We observe that the influence of parameter changes on the clus-                   ablation experiment. From the Table 3, we find that the perfor-
+tering effect is not intensive. Relatively speaking, when 𝛽 is set as                mance of 3𝐴_𝑤/𝑜_𝑆𝐴 is significantly improved on large datasets.
+102 and 𝜆 is set as 104 , the clustering performance will be further                 This fully demonstrates the the importance of high-quality anchor
+improved.                                                                            selection for improving large-scale clustering performance. In addi-
+4.4     Visualization                                                                tion, we found that the performance of 3𝐴_𝑤/𝑜_𝑆𝐴 is lower than
+In order to illustrate the ability of our 3AMVC in anchor selection,                 3𝐴_𝑛𝑒𝑖𝑡ℎ𝑒𝑟 on some datasets, which we hold is due to the mis-
+we employ visual representations to display the selected anchors in                  matching between the anchor points selected by K-means and our
+the single view. We run K-means and our HBNC algorithm on the                        view quality metrics.
+first view of MFeat to select the appropriate anchors, and the results
+are shown in Figure. 5. The samples are represented by points, and                   4.6    Complexity
+the selected anchor points are uniformly represented by red stars.                   Our method can be well applied to large-scale scenes. We record
+From Figure. 5, we observe that our HBNC algorithm effectively                       our time comparison with other algorithms and draw Figure 6.
+
+
+
+
+                                                                              5051
+MM ’24, October 28-November 1, 2024, Melbourne, VIC, Australia                                                                         Huimin Ma et al.
+
+
+              Table 2: Empirical comparison of our 3AMVC with nine baseline methods on five benchmark datasets.
+
+      Methods          BMVC         LMVSC         FMCNOF           FPMVS-CAG EOMSC-CA            FMVACC        UDBGL      fastMICE      Proposed
+                                                                             ACC
+    ForestTypes         0.7266       0.7921        0.4551            0.7222        0.7419          0.7929       0.4990      0.7166       0.7984
+      Reuters           0.4950       0.4792        0.2858            0.4582        0.4758          0.5532       0.2783      0.2856       0.5734
+       MFeat            0.6905       0.5690        0.5695            0.6511        0.8220          0.8322       0.1575      0.8285       0.8737
+     Catech256          0.0871       0.0957        0.0270            0.0891        0.0985          0.0911       0.0776      0.0942       0.1023
+     VGGFace2           0.0617       0.0623        0.0347            0.0634        0.0858          0.0668       0.0511      0.0508       0.0756
+                                                                             NMI
+    ForestTypes         0.5338       0.5446        0.1699            0.4820        0.4724          0.5533       0.3116      0.5171       0.5397
+      Reuters           0.2946       0.2786        0.0715            0.2459        0.2524          0.3377       0.1225      0.1913       0.3316
+       MFeat            0.6653       0.8246        0.5547            0.5777        0.8319          0.7241       0.1990      0.8362       0.8240
+     Catech256          0.3158       0.3196        0.0000            0.2343        0.2468          0.2990       0.2375      0.3235       0.3210
+     VGGFace2           0.1426       0.1191        0.0581            0.1282        0.1578          0.1300       0.1013      0.1040       0.1404
+                                                                            Fscore
+    ForestTypes        0.6729        0.6572        0.4638            0.5828        0.6057          0.6460       0.5127      0.6014       0.6752
+      Reuters          0.3633        0.3570        0.2411            0.3487        0.3367          0.4013       0.3002      0.3320       0.4061
+       MFeat           0.6137        0.7811        0.4552            0.5250        0.7701          0.7078       0.2046      0.7837       0.7986
+     Catech256         0.0663        0.0600        0.0117            0.0322        0.0336          0.0664       0.0148      0.0738       0.0792
+     VGGFace2          0.0277        0.0251        0.0239            0.0314        0.0322          0.0267       0.0217      0.0201       0.0297
+
+
+        Table 3: Experiment results of ablation studies
+
+          Datasets        Methods         ACC        NMI         Fscore
+                        3𝐴_𝑛𝑒𝑖𝑡ℎ𝑒𝑟       0.7231     0.4227       0.5628
+                        3𝐴_𝑤/𝑜_𝑆𝐴        0.6161     0.4502       0.5540
+        ForestTypes
+                        3𝐴_𝑤/𝑜_𝐴𝐵        0.7217     0.4187       0.5604
+                          3𝐴𝑀𝑉 𝐶         0.7984     0.5397       0.6752
+                        3𝐴_𝑛𝑒𝑖𝑡ℎ𝑒𝑟       0.4367     0.2312       0.3153
+                        3𝐴_𝑤/𝑜_𝑆𝐴        0.4199     0.2070       0.2970
+          Reuters
+                        3𝐴_𝑤/𝑜_𝐴𝐵        0.5509     0.3282       0.3886
+                          3𝐴𝑀𝑉 𝐶         0.5734     0.3316       0.4061
+                        3𝐴_𝑛𝑒𝑖𝑡ℎ𝑒𝑟       0.8107     0.7226       0.6970                    Figure 6: Running time for all algorithms.
+                        3𝐴_𝑤/𝑜_𝑆𝐴        0.8107     0.7226       0.6970
+         MFeat_test
+                        3𝐴_𝑤/𝑜_𝐴𝐵        0.8520     0.8178       0.7806
+                          3𝐴𝑀𝑉 𝐶         0.8775     0.8298       0.8044
+                        3𝐴_𝑛𝑒𝑖𝑡ℎ𝑒𝑟       0.0882     0.2951       0.0591           The algorithm initiates with the innovative Hierarchical Bipartite
+                        3𝐴_𝑤/𝑜_𝑆𝐴        0.0922     0.2980       0.0692           Neighbor Clustering (HBNC) approach, which eliminates the need
+         Caltech256
+                        3𝐴_𝑤/𝑜_𝐴𝐵        0.0485     0.2516       0.0203           for a predefined number of clusters. This method identifies and
+                          3𝐴𝑀𝑉 𝐶         0.1023     0.3210       0.0792           selects representative anchors within a single view, enabling the
+                        3𝐴_𝑛𝑒𝑖𝑡ℎ𝑒𝑟       0.0651     0.1267       0.0256           construction of a robust anchor graph without relying on prior
+                        3𝐴_𝑤/𝑜_𝑆𝐴        0.0713     0.1371       0.0282
+         VGGFace2                                                                 knowledge. The subsequent phase involves the alignment of all
+                        3𝐴_𝑤/𝑜_𝐴𝐵        0.0633     0.1262       0.0244
+                          3𝐴𝑀𝑉 𝐶         0.0756     0.1404       0.0297
+                                                                                  anchor graphs to the baseline view exhibiting the highest anchor
+                                                                                  graph quality, culminating in the formation of a consolidated, high-
+                                                                                  quality fused anchor graph. Our proposed method stands out in the
+Compared with FMVACC, our algorithm has a considerable running                    current research landscape by offering an effective parameter-free
+time. The longer running time on the Mfeat dataset may be due                     strategy for anchor point selection. Extensive experiments verify
+to the fact that 3AMVC selects more than 𝑘 anchors compared to                    the effectiveness and efficiency of our proposed 3AMVC.
+other algorithms, resulting in more computing time.
+                                                                                  6   ACKNOWLEDGMENTS
+5    CONCLUSION                                                                   This work was supported by the National Natural Science Founda-
+In this paper, we introduce a novel Multi-view Clustering with Au-                tion of China (project no. 62201600, 62325604, 62276271), NUDT
+tomatic and Aligned Anchor (3AMVC) method designed to address                     Research Project ZK22-56 and NUDT Innovation Fundation Project
+challenges of multi-view clustering in large-scale data scenarios.                23-ZZCXKXKY-07.
+
+
+
+
+                                                                           5052
+Automatic and Aligned Anchor Learning Strategy for Multi-View Clustering                                               MM ’24, October 28-November 1, 2024, Melbourne, VIC, Australia
+
+
+REFERENCES                                                                                          [24] Yue Liu, Wenxuan Tu, Sihang Zhou, Xinwang Liu, Linxuan Song, Xihong Yang,
+ [1] Liang Bai, Xueqi Cheng, Jiye Liang, Huawei Shen, and Yike Guo. 2017. Fast                           and En Zhu. 2022. Deep Graph Clustering via Dual Correlation Reduction. In
+     density clustering strategies based on the k-means algorithm. Pattern Recognition                   Proceedings of the AAAI Conference on Artificial Intelligence, Vol. 36. 7603–7611.
+     71 (2017), 375–386.                                                                            [25] Xun Lu and Songhe Feng. 2023. Structure diversity-induced anchor graph fusion
+ [2] Yiu-ming Cheung and Hong Jia. 2013. Categorical-and-numerical-attribute data                        for multi-view clustering. ACM Transactions on Knowledge Discovery from Data
+     clustering based on a unified similarity metric without knowing cluster number.                     17, 2 (2023), 1–18.
+     Pattern Recognition 46, 8 (2013), 2228–2238.                                                   [26] Huimin Ma, Siwei Wang, Junpu Zhang, et al. 2024. Symmetric Multi-view Sub-
+ [3] Si-Guo Fang, Dong Huang, Xiao-Sha Cai, Chang-Dong Wang, Chaobo He, and                              space Clustering with Automatic Neighbor Discovery. IEEE Transactions on
+     Yong Tang. 2023. Efficient multi-view clustering via unified and discrete bipartite                 Circuits and Systems for Video Technology (2024).
+     graph learning. IEEE Transactions on Neural Networks and Learning Systems                      [27] Vishnu Menon, Gokularam Muthukrishnan, and Sheetal Kalyani. 2020. Subspace
+     (2023).                                                                                             clustering without knowing the number of clusters: A parameter free approach.
+ [4] Dong Huang, Chang-Dong Wang, and Jian-Huang Lai. 2023. Fast multi-view                              IEEE Transactions on Signal Processing 68 (2020), 5047–5062.
+     clustering via ensembles: Towards scalability, superiority, and simplicity. IEEE               [28] Fionn Murtagh and Pedro Contreras. 2012. Algorithms for hierarchical cluster-
+     Transactions on Knowledge and Data Engineering (2023).                                              ing: an overview. Wiley Interdisciplinary Reviews: Data Mining and Knowledge
+ [5] Shudong Huang, Zhao Kang, Zenglin Xu, and Quanhui Liu. 2021. Robust deep                            Discovery 2, 1 (2012), 86–97.
+     k-means: An effective and simple method for data clustering. Pattern Recognition               [29] Frank Nielsen and Frank Nielsen. 2016. Hierarchical clustering. Introduction to
+     117 (2021), 107996.                                                                                 HPC with MPI for Data Science (2016), 195–211.
+ [6] Hong Jia and Yiu-Ming Cheung. 2017. Subspace clustering of categorical and                     [30] Nobuyuki Otsu. 1979. A threshold selection method from gray-level histograms.
+     numerical data with an unknown number of clusters. IEEE transactions on neural                      IEEE transactions on systems, man, and cybernetics 9, 1 (1979), 62–66.
+     networks and learning systems 29, 8 (2017), 3308–3325.                                         [31] Erlin Pan and Zhao Kang. 2021. Multi-view contrastive graph clustering. Advances
+ [7] Zhao Kang, Zhiping Lin, Xiaofeng Zhu, and Wenbo Xu. 2021. Structured graph                          in neural information processing systems 34 (2021), 2148–2159.
+     learning for scalable subspace clustering: From single view to multiview. IEEE                 [32] Shenfei Pei, Huimin Chen, Feiping Nie, Rong Wang, and Xuelong Li. 2022. Cen-
+     Transactions on Cybernetics 52, 9 (2021), 8976–8986.                                                terless clustering. IEEE Transactions on Pattern Analysis and Machine Intelligence
+ [8] Zhao Kang, Guoxin Shi, Shudong Huang, Wenyu Chen, Xiaorong Pu, Joey Tianyi                          45, 1 (2022), 167–181.
+     Zhou, and Zenglin Xu. 2020. Multi-graph fusion for multi-view spectral clustering.             [33] Xi Peng, Huajin Tang, Lei Zhang, Zhang Yi, and Shijie Xiao. 2015. A unified
+     Knowledge-Based Systems 189 (2020), 105102.                                                         framework for representation-based subspace clustering of out-of-sample and
+ [9] Zhao Kang, Wangtao Zhou, Zhitong Zhao, Junming Shao, Meng Han, and Zenglin                          large-scale data. IEEE transactions on neural networks and learning systems 27, 12
+     Xu. 2020. Large-scale multi-view subspace clustering in linear time. In Proceedings                 (2015), 2499–2512.
+     of the AAAI conference on artificial intelligence, Vol. 34. 4412–4419.                         [34] Qianyao Qiang, Bin Zhang, Fei Wang, and Feiping Nie. 2021. Fast multi-view
+[10] Hans-Peter Kriegel, Peer Kröger, Jörg Sander, and Arthur Zimek. 2011. Density-                      discrete clustering with anchor graphs. In Proceedings of the AAAI Conference on
+     based clustering. Wiley interdisciplinary reviews: data mining and knowledge                        Artificial Intelligence, Vol. 35. 9360–9367.
+     discovery 1, 3 (2011), 231–240.                                                                [35] Meitar Ronen, Shahaf E Finder, and Oren Freifeld. 2022. Deepdpm: Deep clus-
+[11] Xuelong Li, Han Zhang, Rong Wang, and Feiping Nie. 2020. Multiview clustering:                      tering with an unknown number of clusters. In Proceedings of the IEEE/CVF
+     A scalable and parameter-free bipartite graph fusion method. IEEE Transactions                      Conference on Computer Vision and Pattern Recognition. 9861–9870.
+     on Pattern Analysis and Machine Intelligence 44, 1 (2020), 330–344.                            [36] Xiaochuang Shu, Xiangdong Zhang, Quanxue Gao, Ming Yang, Rong Wang, and
+[12] Yeqing Li, Feiping Nie, Heng Huang, and Junzhou Huang. 2015. Large-scale                            Xinbo Gao. 2022. Self-weighted anchor graph learning for multi-view clustering.
+     multi-view spectral clustering via bipartite graph. In Proceedings of the AAAI                      IEEE Transactions on Multimedia (2022).
+     conference on artificial intelligence, Vol. 29.                                                [37] Xiaochuang Shu, Xiangdong Zhang, Quanxue Gao, Ming Yang, Rong Wang,
+[13] Zhenglai Li, Chang Tang, Xinwang Liu, Xiao Zheng, Wei Zhang, and En Zhu.                            and Xinbo Gao. 2023. Self-Weighted Anchor Graph Learning for Multi-View
+     2021. Consensus graph learning for multi-view clustering. IEEE Transactions on                      Clustering. IEEE Transactions on Multimedia 25 (2023), 5485–5499. https://doi.
+     Multimedia 24 (2021), 2461–2472.                                                                    org/10.1109/TMM.2022.3193855
+[14] Ke Liang, Lingyuan Meng, Meng Liu, Yue Liu, Wenxuan Tu, Siwei Wang, Sihang                     [38] Mengjing Sun, Pei Zhang, Siwei Wang, Sihang Zhou, Wenxuan Tu, Xinwang Liu,
+     Zhou, Xinwang Liu, Fuchun Sun, and Kunlun He. 2024. A survey of knowl-                              En Zhu, and Changjian Wang. 2021. Scalable multi-view subspace clustering
+     edge graph reasoning on graph types: Static, dynamic, and multi-modal. IEEE                         with unified anchors. In Proceedings of the 29th ACM International Conference on
+     Transactions on Pattern Analysis and Machine Intelligence (2024).                                   Multimedia. 3528–3536.
+[15] Ke Liang, Lingyuan Meng, Sihang Zhou, Wenxuan Tu, Siwei Wang, Yue Liu,                         [39] Chang Tang, Xinwang Liu, Xinzhong Zhu, En Zhu, Zhigang Luo, Lizhe Wang,
+     Meng Liu, Long Zhao, Xiangjun Dong, and Xinwang Liu. 2024. MINES: Message                           and Wen Gao. 2020. CGD: Multi-view clustering via cross-view graph diffusion.
+     Intercommunication for Inductive Relation Reasoning over Neighbor-Enhanced                          In Proceedings of the AAAI conference on artificial intelligence, Vol. 34. 5924–5931.
+     Subgraphs. In Proceedings of the AAAI Conference on Artificial Intelligence, Vol. 38.          [40] Chang Tang, Xinzhong Zhu, Xinwang Liu, Miaomiao Li, Pichao Wang, Changqing
+     10645–10653.                                                                                        Zhang, and Lizhe Wang. 2018. Learning a joint affinity graph for multiview
+[16] Jiyuan Liu, Xinwang Liu, Yuexiang Yang, Li Liu, Siqi Wang, Weixuan Liang, and                       subspace clustering. IEEE Transactions on Multimedia 21, 7 (2018), 1724–1736.
+     Jiangyong Shi. 2021. One-pass multi-view clustering for large-scale data. In                   [41] Xinhang Wan, Xinwang Liu, Jiyuan Liu, Siwei Wang, Yi Wen, Weixuan Liang,
+     Proceedings of the IEEE/CVF international conference on computer vision. 12344–                     En Zhu, Zhe Liu, and Lu Zhou. 2023. Auto-weighted multi-view clustering for
+     12353.                                                                                              large-scale data. In Proceedings of the AAAI Conference on Artificial Intelligence,
+[17] Suyuan Liu, Qing Liao, Siwei Wang, Xinwang Liu, and En Zhu. 2024. Robust and                        Vol. 37. 10078–10086.
+     Consistent Anchor Graph Learning for Multi-View Clustering. IEEE Transactions                  [42] Hao Wang, Yan Yang, and Bing Liu. 2019. GMC: Graph-based multi-view cluster-
+     on Knowledge and Data Engineering (2024).                                                           ing. IEEE Transactions on Knowledge and Data Engineering 32, 6 (2019), 1116–1129.
+[18] Suyuan Liu, Siwei Wang, Pei Zhang, Kai Xu, Xinwang Liu, Changwang Zhang,                       [43] Siwei Wang, Xinwang Liu, Suyuan Liu, Jiaqi Jin, Wenxuan Tu, Xinzhong Zhu,
+     and Feng Gao. 2022. Efficient one-pass multi-view subspace clustering with                          and En Zhu. 2022. Align then fusion: Generalized large-scale multi-view clus-
+     consensus anchors. In Proceedings of the AAAI Conference on Artificial Intelligence,                tering with anchor matching correspondences. Advances in Neural Information
+     Vol. 36. 7576–7584.                                                                                 Processing Systems 35 (2022), 5882–5895.
+[19] Xinwang Liu. 2022. Simplemkkm: Simple multiple kernel k-means. IEEE Trans-                     [44] Siwei Wang, Xinwang Liu, Xinzhong Zhu, Pei Zhang, Yi Zhang, Feng Gao, and En
+     actions on Pattern Analysis and Machine Intelligence 45, 4 (2022), 5174–5186.                       Zhu. 2021. Fast parameter-free multi-view subspace clustering with consensus
+[20] Xinwang Liu, Yong Dou, Jianping Yin, Lei Wang, and En Zhu. 2016. Multiple                           anchor guidance. IEEE Transactions on Image Processing 31 (2021), 556–568.
+     kernel k-means clustering with matrix-induced regularization. In Proceedings of                [45] Yiming Wang, Dongxia Chang, Zhiqiang Fu, Jie Wen, and Yao Zhao. 2022. Graph
+     the AAAI conference on artificial intelligence, Vol. 30.                                            contrastive partial multi-view clustering. IEEE Transactions on Multimedia (2022).
+[21] Xinwang Liu, Xinzhong Zhu, Miaomiao Li, Lei Wang, En Zhu, Tongliang Liu,                       [46] Yiming Wang, Dongxia Chang, Zhiqiang Fu, and Yao Zhao. 2021. Consistent mul-
+     Marius Kloft, Dinggang Shen, Jianping Yin, and Wen Gao. 2019. Multiple kernel                       tiple graph embedding for multi-view clustering. IEEE transactions on multimedia
+     𝑘 k-means with incomplete kernels. IEEE transactions on pattern analysis and                        25 (2021), 1008–1018.
+     machine intelligence 42, 5 (2019), 1191–1204.                                                  [47] Yi Wen, Siwei Wang, Qing Liao, Weixuan Liang, Ke Liang, Xinhang Wan, and Xin-
+[22] Yue Liu, Ke Liang, Jun Xia, Xihong Yang, Sihang Zhou, Meng Liu, Xinwang Liu,                        wang Liu. 2023. Unpaired multi-view graph clustering with cross-view structure
+     and Stan Z Li. 2023. Reinforcement Graph Clustering with Unknown Cluster                            matching. IEEE Transactions on Neural Networks and Learning Systems (2023).
+     Number. In Proceedings of the 31st ACM International Conference on Multimedia.                 [48] Danyang Wu, Jitao Lu, Feiping Nie, Rong Wang, and Yuan Yuan. 2022. EMGC2f:
+     3528–3537.                                                                                          Efficient multi-view graph clustering with comprehensive fusion. In Proc. IJCAI.
+[23] Yue Liu, Ke Liang, Jun Xia, Sihang Zhou, Xihong Yang, Xinwang Liu, and Z. Stan                      3566–3572.
+     Li. 2023. Dink-Net: Neural Clustering on Large Graphs. In Proc. of ICML.                       [49] Ben Yang, Xuetao Zhang, Zhongheng Li, Feiping Nie, and Fei Wang. 2022. Efficient
+                                                                                                         multi-view K-means clustering with multiple anchor graphs. IEEE Transactions
+                                                                                                         on Knowledge and Data Engineering (2022).
+
+
+
+
+                                                                                             5053
+MM ’24, October 28-November 1, 2024, Melbourne, VIC, Australia                                                                                                            Huimin Ma et al.
+
+
+[50] Ben Yang, Xuetao Zhang, Zhiping Lin, Feiping Nie, Badong Chen, and Fei Wang.                        Conference on Artificial Intelligence, Vol. 38. 16558–16567.
+     2022. Efficient and robust MultiView clustering with anchor graph regularization.              [58] Shengju Yu, Siwei Wang, Yi Wen, Ziming Wang, et al. 2023. How to construct
+     IEEE Transactions on Circuits and Systems for Video Technology 32, 9 (2022), 6200–                  corresponding anchors for incomplete multiview clustering. IEEE Transactions
+     6213.                                                                                               on Circuits and Systems for Video Technology (2023).
+[51] Ben Yang, Xuetao Zhang, Feiping Nie, Fei Wang, Weizhong Yu, and Rong Wang.                     [59] Shengju Yu, Siwei Wang, Pei Zhang, Miao Wang, Ziming Wang, et al. 2024.
+     2020. Fast multi-view clustering via nonnegative and orthogonal factorization.                      Dvsai: Diverse view-shared anchors based incomplete multi-view clustering. In
+     IEEE Transactions on Image Processing 30 (2020), 2575–2586.                                         Proceedings of the AAAI Conference on Artificial Intelligence, Vol. 38. 16568–16577.
+[52] Xihong Yang, Jin Jiaqi, Siwei Wang, Ke Liang, Yue Liu, Yi Wen, Suyuan Liu, Sihang              [60] Guang-Yu Zhang, Chang-Dong Wang, Dong Huang, Wei-Shi Zheng, and Yu-Ren
+     Zhou, Xinwang Liu, and En Zhu. 2023. Dealmvc: Dual contrastive calibration for                      Zhou. 2018. TW-Co-k-means: Two-level weighted collaborative k-means for
+     multi-view clustering. In Proceedings of the 31st ACM International Conference on                   multi-view clustering. Knowledge-Based Systems 150 (2018), 127–138.
+     Multimedia. 337–346.                                                                           [61] Han Zhang, Feiping Nie, and Xuelong Li. 2023. Large-Scale Clustering With
+[53] Xihong Yang, Yue Liu, Sihang Zhou, Siwei Wang, Wenxuan Tu, Qun Zheng,                               Structured Optimal Bipartite Graph. IEEE Transactions on Pattern Analysis and
+     Xinwang Liu, Liming Fang, and En Zhu. 2023. Cluster-guided Contrastive Graph                        Machine Intelligence 45, 8 (2023), 9950–9963. https://doi.org/10.1109/TPAMI.2023.
+     Clustering Network. In Proceedings of the AAAI conference on artificial intelligence,               3277532
+     Vol. 37. 10834–10842.                                                                          [62] Pei Zhang, Siwei Wang, Liang Li, Changwang Zhang, Xinwang Liu, En Zhu,
+[54] Xihong Yang, Cheng Tan, Yue Liu, Ke Liang, Siwei Wang, Sihang Zhou, Jun                             Zhe Liu, Lu Zhou, and Lei Luo. 2023. Let the data choose: Flexible and diverse
+     Xia, Stan Z Li, Xinwang Liu, and En Zhu. 2023. Convert: Contrastive graph                           anchor graph fusion for scalable multi-view clustering. In Proceedings of the AAAI
+     clustering with reliable augmentation. In Proceedings of the 31st ACM International                 Conference on Artificial Intelligence, Vol. 37. 11262–11269.
+     Conference on Multimedia. 319–327.                                                             [63] Tiejian Zhang, Xinwang Liu, En Zhu, Sihang Zhou, and Zhibin Dong. 2022.
+[55] Shengju Yu, Zhibin Dong, Siwei Wang, Xinhang Wan, et al. 2024. Towards                              Efficient anchor learning-based multi-view clustering–a late fusion method. In
+     Resource-friendly, Extensible and Stable Incomplete Multi-view Clustering. In                       Proceedings of the 30th ACM International Conference on Multimedia. 3685–3693.
+     International Conference on Machine Learning. PMLR, 57415–57440.                               [64] Zheng Zhang, Li Liu, Fumin Shen, Heng Tao Shen, and Ling Shao. 2018. Bi-
+[56] Shengju Yu, Suyuan Liu, Siwei Wang, Chang Tang, Zhigang Luo, Xinwang Liu,                           nary multi-view clustering. IEEE transactions on pattern analysis and machine
+     and En Zhu. 2023. Sparse Low-Rank Multi-View Subspace Clustering With                               intelligence 41, 7 (2018), 1774–1782.
+     Consensus Anchors and Unified Bipartite Graph. IEEE Transactions on Neural                     [65] Wei Zhu, Feiping Nie, and Xuelong Li. 2017. Fast spectral clustering with efficient
+     Networks and Learning Systems (2023).                                                               large graph construction. In 2017 IEEE international conference on acoustics, speech
+[57] Shengju Yu, Siwei Wang, Zhibin Dong, Wenxuan Tu, et al. 2024. A non-parametric                      and signal processing (ICASSP). IEEE, 2492–2496.
+     graph clustering framework for multi-view data. In Proceedings of the AAAI
+
+
+
+
+                                                                                             5054
+

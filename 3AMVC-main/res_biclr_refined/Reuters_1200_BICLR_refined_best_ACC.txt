@@ -2,80 +2,80 @@ BIC-LR 精细搜索最优 ACC 结果
 
 【一、按重复评价均值+标准差上界 ACC 最高】
 数据集：Reuters-1200
-来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Reuters_1200_BICLR_grid_20260512_184021.mat
+来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Reuters_1200_BICLR_grid_20260519_205016.mat
 选择准则：ACC
 选择口径：按重复评价均值+标准差上界
-beta=2000
-lambda=10000
-lambdaBIC=0.22
-minNodeSize=22
+beta=800
+lambda=100
+lambdaBIC=0.35
+minNodeSize=16
 tauSplit=0
 epsVar=1e-08
 randomSeed=1
 numRuns=8
 kmeansReplicates=4
 evalSummaryMode=bestacc
-bestEvalRun=1
-bestEvalSeed=1
-anchorCounts=[47 48 46 48 48]
-targetView=4
+bestEvalRun=3
+bestEvalSeed=3
+anchorCounts=[41 42 47 38 47]
+targetView=1
 anchorQualityMethod=BICUnitEvidenceGain
-anchorEvidenceGain=[0.0298597 0.0305339 0.0298907 0.0311631 0.0277496]
+anchorEvidenceGain=[0.0220849 0.0193578 0.0190008 0.0195163 0.0155026]
 重复评价均值±标准差：
-ACC=0.636458 ± 0.023224
-NMI=0.376245 ± 0.013310
-Purity=0.636458 ± 0.023224
-Fscore=0.451689 ± 0.020190
+ACC=0.647500 ± 0.029032
+NMI=0.399846 ± 0.021792
+Purity=0.647500 ± 0.029032
+Fscore=0.469724 ± 0.023865
 重复评价逐指标范围：
-ACC=[0.580833, 0.655000]
-NMI=[0.349863, 0.390303]
-Purity=[0.580833, 0.655000]
-Fscore=[0.408269, 0.469917]
+ACC=[0.570833, 0.662500]
+NMI=[0.342711, 0.411682]
+Purity=[0.570833, 0.662500]
+Fscore=[0.406762, 0.482169]
 选优汇总指标：
-summaryACC=0.655000
-summaryNMI=0.390303
-summaryPurity=0.655000
-summaryFscore=0.469813
-bestRun指标：ACC=0.655000，NMI=0.390303，Purity=0.655000，Fscore=0.469813
-总耗时=366.81s
-缓存键=Reuters_1200_raw_view1_BICLR_lamBIC0p22_minNode22_seed1, Reuters_1200_raw_view2_BICLR_lamBIC0p22_minNode22_seed1, Reuters_1200_raw_view3_BICLR_lamBIC0p22_minNode22_seed1, Reuters_1200_raw_view4_BICLR_lamBIC0p22_minNode22_seed1, Reuters_1200_raw_view5_BICLR_lamBIC0p22_minNode22_seed1
+summaryACC=0.662500
+summaryNMI=0.411682
+summaryPurity=0.662500
+summaryFscore=0.482169
+bestRun指标：ACC=0.662500，NMI=0.411682，Purity=0.662500，Fscore=0.482169
+总耗时=1494.53s
+缓存键=Reuters_1200_raw_view1_BICLR_lamBIC0p35_minNode16_tau0_eps1ep08_seed1_rmClutter0_capall, Reuters_1200_raw_view2_BICLR_lamBIC0p35_minNode16_tau0_eps1ep08_seed1_rmClutter0_capall, Reuters_1200_raw_view3_BICLR_lamBIC0p35_minNode16_tau0_eps1ep08_seed1_rmClutter0_capall, Reuters_1200_raw_view4_BICLR_lamBIC0p35_minNode16_tau0_eps1ep08_seed1_rmClutter0_capall, Reuters_1200_raw_view5_BICLR_lamBIC0p35_minNode16_tau0_eps1ep08_seed1_rmClutter0_capall
 
 【二、按重复评价平均 ACC 最高】
 数据集：Reuters-1200
-来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Reuters_1200_BICLR_grid_20260512_184021.mat
+来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Reuters_1200_BICLR_grid_20260519_205016.mat
 选择准则：ACC
 选择口径：按重复评价平均
 beta=2000
 lambda=1000
-lambdaBIC=0.22
-minNodeSize=22
+lambdaBIC=0.35
+minNodeSize=16
 tauSplit=0
 epsVar=1e-08
 randomSeed=1
 numRuns=8
 kmeansReplicates=4
 evalSummaryMode=bestacc
-bestEvalRun=2
-bestEvalSeed=2
-anchorCounts=[47 48 46 48 48]
-targetView=4
+bestEvalRun=6
+bestEvalSeed=6
+anchorCounts=[41 42 47 38 47]
+targetView=1
 anchorQualityMethod=BICUnitEvidenceGain
-anchorEvidenceGain=[0.0298597 0.0305339 0.0298907 0.0311631 0.0277496]
+anchorEvidenceGain=[0.0220849 0.0193578 0.0190008 0.0195163 0.0155026]
 重复评价均值±标准差：
-ACC=0.637083 ± 0.005069
-NMI=0.372111 ± 0.004383
-Purity=0.637083 ± 0.005069
-Fscore=0.450353 ± 0.005687
+ACC=0.648438 ± 0.011361
+NMI=0.398856 ± 0.011690
+Purity=0.648438 ± 0.011361
+Fscore=0.464764 ± 0.011501
 重复评价逐指标范围：
-ACC=[0.627500, 0.645000]
-NMI=[0.363085, 0.378857]
-Purity=[0.627500, 0.645000]
-Fscore=[0.441562, 0.459050]
+ACC=[0.625000, 0.662500]
+NMI=[0.380863, 0.415928]
+Purity=[0.625000, 0.662500]
+Fscore=[0.445229, 0.480371]
 选优汇总指标：
-summaryACC=0.645000
-summaryNMI=0.378857
-summaryPurity=0.645000
-summaryFscore=0.459050
-bestRun指标：ACC=0.645000，NMI=0.378857，Purity=0.645000，Fscore=0.459050
-总耗时=366.81s
-缓存键=Reuters_1200_raw_view1_BICLR_lamBIC0p22_minNode22_seed1, Reuters_1200_raw_view2_BICLR_lamBIC0p22_minNode22_seed1, Reuters_1200_raw_view3_BICLR_lamBIC0p22_minNode22_seed1, Reuters_1200_raw_view4_BICLR_lamBIC0p22_minNode22_seed1, Reuters_1200_raw_view5_BICLR_lamBIC0p22_minNode22_seed1
+summaryACC=0.662500
+summaryNMI=0.415928
+summaryPurity=0.662500
+summaryFscore=0.480371
+bestRun指标：ACC=0.662500，NMI=0.415928，Purity=0.662500，Fscore=0.480371
+总耗时=1494.53s
+缓存键=Reuters_1200_raw_view1_BICLR_lamBIC0p35_minNode16_tau0_eps1ep08_seed1_rmClutter0_capall, Reuters_1200_raw_view2_BICLR_lamBIC0p35_minNode16_tau0_eps1ep08_seed1_rmClutter0_capall, Reuters_1200_raw_view3_BICLR_lamBIC0p35_minNode16_tau0_eps1ep08_seed1_rmClutter0_capall, Reuters_1200_raw_view4_BICLR_lamBIC0p35_minNode16_tau0_eps1ep08_seed1_rmClutter0_capall, Reuters_1200_raw_view5_BICLR_lamBIC0p35_minNode16_tau0_eps1ep08_seed1_rmClutter0_capall

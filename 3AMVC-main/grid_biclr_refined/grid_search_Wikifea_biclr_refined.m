@@ -9,10 +9,10 @@ seed = 1;  % 固定随机种子；用于锚点缓存键和 KMeans 重复评价�
 rng(seed, 'twister');  % 初始化 MATLAB 随机数流，避免不同会话中的 KMeans 初始化差异。
 
 config = struct();  % 创建配置结构体，后续字段会传入 run_biclr_grid_search。
-config.betaList = [80 100 120];  % res_biclr 粗搜索中 beta=100 最优，精细搜索保留左右邻域。
-config.lambdaList = [1e2 1e3 1e4];  % Top 配置覆盖 1e3/1e4，同时保留 1e2 以兼容已有较优精细搜索区域。
-config.lambdaBICList = [3 3.5 4 4.5 5];  % 粗搜索最优在 lambdaBIC=4 的上边界，向更强惩罚方向继续探测。
-config.minNodeSizeList = [30 40 50];  % 粗搜索中 minNodeSize=40 最优，向两侧小范围扩展以验证稳定性。
+config.betaList = [80 100 120 160 200];  % 200905 结果中高值全部落在 beta=100 的粗搜上界，向 160/200 继续复核。
+config.lambdaList = [1e2 3e2 1e3 3e3 1e4];  % 高值覆盖 1e2/1e3/1e4，加入 3e2/3e3 检查对齐强度过渡区。
+config.lambdaBICList = [2 3 4 5 6];  % bestSummary 在 2，bestMean/bestUpper 在 4，同时向更强惩罚 5/6 外扩。
+config.minNodeSizeList = [10 20 30 40 50];  % bestMean 在 10，bestSummary/bestUpper 在 40，保留两端并加入中间节点规模。
 config.anchorOptions = struct( ...  % BIC-LR 锚点生成的固定工程参数，和 lambdaBIC/minNodeSize 网格共同决定锚点。
     'tauSplit', 0, ...  % 接受分裂的得分阈值；BIC-LR 得分必须大于该值才继续二分，0 表示只接受正收益分裂。
     'epsVar', 1e-8, ...  % 方差数值保护项；避免节点 SSE 极小时对数似然出现 log(0) 或数值不稳定。

@@ -1,0 +1,28 @@
+# 详细指标表（mean 口径）
+
+| Dataset | Method | Source | Result_type | ACC | NMI | AR | Purity | Fscore | Precision | Recall | Entropy | Selected_beta | Selected_lambda | Selected_lambdaBIC | Selected_minNodeSize | Delta_ACC | Delta_NMI | Delta_AR |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Mfeat | Original 3AMVC Baseline | Paper reported 3AMVC | mean | 0.8737 | 0.824 | Missing | Missing | 0.7986 | Missing | Missing | Missing | Missing | Missing | Missing | Missing | Missing | Missing | Missing |
+| Mfeat | A0_Full_Reference | A0 result from 3AMVC-main/res_biclr_refined | mean | 0.8943 | 0.826028 | 0.798916 | 0.89705 | 0.81918 | 0.811975 | 0.826721 | 3.30852 | 100 | 1000 | 0.75 | 32 | 0.0206 | 0.0020283 | Missing |
+| Mfeat | A1_woBIC_Joint | local ablation result | mean | 0.899 | 0.823274 | 0.796562 | 0.899 | 0.816915 | 0.813031 | 0.820842 | 3.31495 | 100 | 3000 | 0 | 24 | 0.0047 | -0.00275443 | -0.00235385 |
+| Mfeat | A3_SSETarget | local ablation result | mean | 0.899 | 0.823274 | 0.796562 | 0.899 | 0.816915 | 0.813031 | 0.820842 | 3.31495 | 100 | 3000 | 0.5 | 24 | 0.0047 | -0.00275443 | -0.00235385 |
+| Mfeat | A4_woMultiViewFusion | local ablation result | mean | 0.5837 | 0.534662 | 0.401555 | 0.5994 | 0.464067 | 0.442715 | 0.487915 | 3.24703 | 160 | Missing | 2 | 40 | -0.3106 | -0.291366 | -0.397361 |
+| Reuters-1200 | Original 3AMVC Baseline | Paper reported 3AMVC | mean | 0.5734 | 0.3316 | Missing | Missing | 0.4061 | Missing | Missing | Missing | Missing | Missing | Missing | Missing | Missing | Missing | Missing |
+| Reuters-1200 | A0_Full_Reference | A0 result from 3AMVC-main/res_biclr_refined | mean | 0.648125 | 0.397749 | 0.357132 | 0.648125 | 0.465282 | 0.459165 | 0.471604 | 2.56449 | 2000 | 1000 | 0.35 | 16 | 0.074725 | 0.0661494 | Missing |
+| Reuters-1200 | A1_woBIC_Joint | local ablation result | mean | 0.560521 | 0.338053 | 0.2669 | 0.56125 | 0.396326 | 0.372973 | 0.423048 | 2.49115 | 125 | 100 | 0 | 16 | -0.0876042 | -0.0596966 | -0.0902325 |
+| Reuters-1200 | A3_SSETarget | local ablation result | mean | 0.595625 | 0.361978 | 0.295704 | 0.595625 | 0.419198 | 0.397899 | 0.443817 | 2.49125 | 50 | 300 | 0.5 | 10 | -0.0525 | -0.0357712 | -0.0614285 |
+| Reuters-1200 | A4_woMultiViewFusion | local ablation result | mean | 0.610521 | 0.34621 | 0.310347 | 0.610521 | 0.427129 | 0.419246 | 0.43562 | 2.55378 | 50 | Missing | 0.5 | 12 | -0.0376042 | -0.0515398 | -0.0467855 |
+| WIKI | A0_Full_Reference | A0 result parsed from 3AMVC-main/res_biclr_refined text | mean | 0.557877 | 0.520398 | Missing | 0.616321 | 0.451136 | Missing | Missing | Missing | 100 | 10000 | 4.5 | 30 | Missing | Missing | Missing |
+| WIKI | A1_woBIC_Joint | local ablation result | mean | 0.539166 | 0.50969 | 0.378559 | 0.59447 | 0.446018 | 0.442921 | 0.449324 | 3.25551 | 100 | 1000 | 0 | 50 | -0.0187109 | -0.0107079 | Missing |
+| WIKI | A3_SSETarget | local ablation result | mean | 0.580338 | 0.524924 | 0.43272 | 0.616975 | 0.493123 | 0.499049 | 0.487337 | 3.28146 | 80 | 1000 | 2.5 | 30 | 0.0224615 | 0.00452619 | Missing |
+| WIKI | A4_woMultiViewFusion | local ablation result | mean | 0.554606 | 0.510986 | 0.360312 | 0.598875 | 0.431955 | 0.41652 | 0.449567 | 3.22018 | 100 | Missing | 3.5 | 50 | -0.00327128 | -0.00941229 | Missing |
+| Caltech256 | Original 3AMVC Baseline | Original 3AMVC local run on catlch256_4Views_257cls_withClutter | mean | 0.18074 | 0.416494 | 0.112127 | 0.235306 | 0.117138 | 0.121842 | 0.112803 | 7.75315 | 30 | 300000 | Missing | Missing | Missing | Missing | Missing |
+| Caltech256 | A0_Full_Reference | A0 result parsed from 3AMVC-main/res_biclr_refined text | mean | 0.3043 | 0.5379 | Missing | 0.3799 | 0.2105 | Missing | Missing | Missing | 200 | 1000 | 3 | 120 | 0.12356 | 0.121406 | Missing |
+| Caltech256 | A1_woBIC_Joint | local ablation result | mean | 0.318805 | 0.555882 | 0.220916 | 0.397349 | 0.22481 | 0.264127 | 0.19569 | 7.9181 | 200 | 500 | 0 | 160 | 0.0145051 | 0.0179816 | Missing |
+| Caltech256 | A3_SSETarget | local ablation result | mean | 0.244367 | 0.481359 | 0.166515 | 0.308187 | 0.170747 | 0.197462 | 0.150403 | 7.89844 | 150 | 10000 | 3 | 80 | -0.0599332 | -0.0565415 | Missing |
+| Caltech256 | A4_woMultiViewFusion | local ablation result | mean | 0.088923 | 0.315728 | 0.0610468 | 0.149748 | 0.0656055 | 0.0793345 | 0.0559278 | 7.9582 | 200 | Missing | 4 | 160 | -0.215377 | -0.222172 | Missing |
+| ForestTypes | Original 3AMVC Baseline | Paper reported 3AMVC | mean | 0.7984 | 0.5397 | Missing | Missing | 0.6752 | Missing | Missing | Missing | Missing | Missing | Missing | Missing | Missing | Missing | Missing |
+| ForestTypes | A0_Full_Reference | A0 result from 3AMVC-main/res_biclr_refined | mean | 0.758509 | 0.485882 | 0.485688 | 0.770172 | 0.627554 | 0.642072 | 0.613767 | 1.94122 | 200 | 1000 | 0.75 | 24 | -0.0398914 | -0.0538175 | Missing |
+| ForestTypes | A1_woBIC_Joint | local ablation result | mean | 0.784704 | 0.494198 | 0.515935 | 0.784704 | 0.649521 | 0.662623 | 0.63751 | 1.93147 | 100 | 30 | 0 | 20 | 0.026195 | 0.00831562 | 0.0302472 |
+| ForestTypes | A3_SSETarget | local ablation result | mean | 0.804015 | 0.515392 | 0.548162 | 0.804015 | 0.674128 | 0.681996 | 0.666915 | 1.9207 | 100 | 30 | 0.2 | 20 | 0.0455067 | 0.0295091 | 0.0624739 |
+| ForestTypes | A4_woMultiViewFusion | local ablation result | mean | 0.67782 | 0.377165 | 0.352964 | 0.692161 | 0.532145 | 0.541557 | 0.523382 | 1.9294 | 160 | Missing | 0.2 | 16 | -0.0806883 | -0.108717 | -0.132724 |

@@ -1,0 +1,30 @@
+\contentsline {section}{\numberline {1}问题定义}{3}{section.1}%
+\contentsline {section}{\numberline {2}方法总体框架}{3}{section.2}%
+\contentsline {section}{\numberline {3}符号定义}{4}{section.3}%
+\contentsline {section}{\numberline {4}BIC 正则化似然比锚点选择}{5}{section.4}%
+\contentsline {subsection}{\numberline {4.1}节点统计量与平方误差}{5}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}原假设与备择假设}{6}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}单簇模型的极大似然}{6}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}双簇共享方差模型的极大似然}{7}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}似然比统计量与 BIC 证据校准}{7}{subsection.4.5}%
+\contentsline {subsection}{\numberline {4.6}候选切分的确定性扫描}{8}{subsection.4.6}%
+\contentsline {subsection}{\numberline {4.7}视图级 BIC 证据与基准视图选择}{8}{subsection.4.7}%
+\contentsline {section}{\numberline {5}多视图锚图学习目标}{9}{section.5}%
+\contentsline {section}{\numberline {6}优化变量更新推导}{10}{section.6}%
+\contentsline {subsection}{\numberline {6.1}更新视图基矩阵：最小二乘与正交 Procrustes}{10}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}更新锚图矩阵：概率单纯形投影}{11}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}概率单纯形投影的 KKT 推导}{12}{subsection.6.3}%
+\contentsline {section}{\numberline {7}跨视图锚点对齐}{12}{section.7}%
+\contentsline {subsection}{\numberline {7.1}锚点结构图与跨视图相似矩阵}{12}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}投影固定点匹配目标}{13}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}相似度加权映射}{14}{subsection.7.3}%
+\contentsline {section}{\numberline {8}等权融合与聚类}{14}{section.8}%
+\contentsline {subsection}{\numberline {8.1}融合锚图}{14}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}奇异向量嵌入与 KMeans}{15}{subsection.8.2}%
+\contentsline {section}{\numberline {9}完整算法}{16}{section.9}%
+\contentsline {section}{\numberline {10}收敛性与停止准则}{17}{section.10}%
+\contentsline {section}{\numberline {11}复杂度分析}{17}{section.11}%
+\contentsline {subsection}{\numberline {11.1}BIC-LR 锚点选择复杂度}{17}{subsection.11.1}%
+\contentsline {subsection}{\numberline {11.2}视图内锚图优化复杂度}{17}{subsection.11.2}%
+\contentsline {subsection}{\numberline {11.3}跨视图对齐与聚类复杂度}{18}{subsection.11.3}%
+\contentsline {section}{\numberline {12}方法特点与边界}{18}{section.12}%

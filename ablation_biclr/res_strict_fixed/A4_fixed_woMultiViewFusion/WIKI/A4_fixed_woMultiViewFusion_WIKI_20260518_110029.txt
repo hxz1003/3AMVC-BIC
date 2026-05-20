@@ -1,0 +1,33 @@
+fixed-parameter strict ablation 结果摘要
+method=A4_fixed_woMultiViewFusion
+dataset=WIKI
+fixedFrom=A0_best_res_biclr_refined
+changedOnly=仅关闭多视图对齐融合，使用目标视图单视图锚图聚类；lambda 记录但不参与计算。
+beta=120
+lambda=10000
+lambdaBIC=4.5
+minNodeSize=30
+numRuns=8
+seed=1
+targetView=2
+A0_targetView=2
+BIC_targetView=2
+SSE_targetView=1
+anchorCounts=[15 35]
+avgAnchors=25.000000
+acceptedSplits=[14 34]
+rejectedSplits=[15 35]
+meanLeafSize=[191.067 81.8857]
+maxDepth=[6 11]
+ACC_mean=0.539384, ACC_std=0.017279, ACC_best=0.561061
+NMI_mean=0.507961, NMI_std=0.003576, NMI_best=0.511524
+AR_mean=0.340745, AR_std=0.012592, AR_best=0.352499
+anchorTime=0.222745
+alignmentTime=0.000000
+modelTime=0.526845
+evalTime=0.430460
+totalTime=1.218061
+lambdaNotUsed=1
+useMultiViewFusion=0
+cacheHit=[false false]
+notes=fixed-parameter strict ablation；参数来自 A0 best；不执行 grid search；仅关闭多视图对齐融合，lambda 保存但不参与计算，alignmentTime 记为 0。

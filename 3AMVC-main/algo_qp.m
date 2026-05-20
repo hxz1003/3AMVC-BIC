@@ -34,7 +34,8 @@ Zi = cell(numview, 1);
 for i = 1:numview
     anchorCount = size(theta{i}, 1);
     A{i} = theta{i}';
-    % 原始 3AMVC 主优化在视图内部执行标准化；锚点仅作为 A 的初始化，后续会在标准化空间更新。
+    % 沿用原始 3AMVC 的视图内标准化流程；theta 只初始化 A，随后 A 与 Z
+    % 均在标准化后的特征空间中更新，因此不在锚点选择阶段重复改写输入数据。
     X{i} = mapstd(X{i}',0,1); % turn into d*n
 
     M{i} = A{i}' * X{i};
@@ -54,7 +55,8 @@ while flag
     iter = iter + 1;
     
     %% optimize A_i
-    parfor ia = 1:numview
+    % 视图数通常较少，串行更新可避免未配置并行环境时对 Parallel Computing Toolbox 的依赖。
+    for ia = 1:numview
         if size(A{ia},1)<size(A{ia},2)
             A{ia} = X{ia}*Zi{ia}'*pinv(Zi{ia}*Zi{ia}');
         else

@@ -30,9 +30,9 @@ end
 
 preOptions = options;
 preOptions.randomSeed = [];
- tic
- [label_pre,object_pre,~,~,~] = Pre_HBNC(X0, preOptions);
- [label,object,theta,~,class] = Impro_HBNC(X0,label_pre,object_pre);
+tic
+[label_pre,object_pre,~,~,~] = Pre_HBNC(X0, preOptions);
+[label,object,theta,~,class] = Impro_HBNC(X0,label_pre,object_pre);
 %%  Organize label results
 
 label_neighbor = label;

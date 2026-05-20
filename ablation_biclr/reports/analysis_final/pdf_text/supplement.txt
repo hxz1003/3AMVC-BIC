@@ -1,0 +1,219 @@
+1
+2
+            Supplementary Materials: Automatic and Aligned Anchor                                                                                      59
+                                                                                                                                                       60
+3                 Learning Strategy for Multi-View Clustering                                                                                          61
+4                                                                                                                                                      62
+5
+                                                                Anonymous Authors                                                                      63
+6                                                                                                                                                      64
+7    1     ADDITIONAL REMARK FOR OPTIMIZATION                                                                                                          65
+8                                                                                                                                                      66
+     In order to optimize the alignment matrix P, the problem of aligning
+9                                                                                                                                                      67
+     two anchor sets is formulated as follows:
+10                                                                                                                                                     68
+11                  min ∥Z𝑏 − Z𝑖 P∥ 2F + 𝜆∥G𝑏 − P⊤ G𝑖 P∥ 2F                                                                                            69
+                     P
+12                                                                                                                                                     70
+                    ⇔ max Tr(Z⊤             ⊤
+                              b Zi P + 𝜆Gb P Gi P),                    (1)
+13                     P                                                                                                                               71
+14                  s.t. P1 = 1, P⊤ 1 = 1, P ∈ {0, 1}𝑚𝑖 ×𝑚𝑏 .                                                                                          72
+15                                                                                                                                                     73
+16
+        The above problem is a quadratic assignment problem (QAP)                          (a) MFeat                         (b) Reuters
+                                                                                                                                                       74
+17
+     and generally is proved to be NP-hard[1]. The feasible region con-                                                                                75
+18
+     straint often relaxes into its convex hull, the Birkhoff polytope with                                                                            76
+19
+     double stochastic region. Then the optimization problem can be                                                                                    77
+20
+     transformed as                                                                                                                                    78
+21                  max Tr(Z⊤             ⊤
+                            b Zi P + 𝜆Gb P Gi P),                                                                                                      79
+                      P                                                (2)
+22                                                                                                                                                     80
+                    s.t. P1 = 1, P⊤ 1 = 1, P ∈ [0, 1]𝑚𝑖 ×𝑚𝑏 .
+23                                                                                                                                                     81
+24      To solve Eq. (2), we use the Projection Fixed-Point Algorithm                                                                                  82
+25   [2] to update P as follows:                                                                                                                       83
+26                                                                                   (c) Caltech256                       (d) VGG2                 84
+27             P (𝑡 +1) = (1 − 𝛼)P (𝑡 ) + 𝛼Γ ∇𝑓 P (𝑡 )                                                                                                 85
+                                                                    (3)
+28                                                                            Figure 1: The variation of the objective value with the number           86
+                                                      
+             =(1 − 𝛼)P (𝑡 ) + 𝛼Γ K⊤ + 2𝜆G𝑖 P (𝑡 ) G𝑏⊤ , 𝛼 ∈ [0, 1],
+29                                                                            of iterations on four datasets.                                          87
+30   where 𝛼 denotes the step size parameter, 𝑡 denotes the number of                                                                                  88
+31   iterations, Γ denotes the double stochastic projection operator and      Table 1: The number of anchors selected by HBNC on all                   89
+32   K = Z𝑏⊤ Z𝑖 . We set 𝛼 = 0.5 in this paper.                               datasets.                                                                90
+33                                                                                                                                                     91
+34   2 EXPERIMENTS                                                                       Dataset       Baseline   View   Number of anchors             92
+35                                                                                                                  1           10                     93
+36
+     2.1 Convergence                                                                   ForestTypes                  2           16                     94
+37   We demonstrate the convergence of the proposed 3AMVC on four                                         ✓         3          20                      95
+38   datasets (MFeat, Reuters, Caltech256, VGG2) in Figure 1. As seen,                    MFeat
+                                                                                                          ✓         1          54                      96
+39   our 3AMVC algorithm can gradually converge to a stable state as                                                2           64                     97
+40   the number of iterations increases.                                                                            1           62                     98
+                                                                                                                    2           48
+41                                                                                                                                                     99
+                                                                                         Reuters                    3           45
+42   2.2    Visualization of Anchor Selection                                                                       4           13                     100
+43   We record the number of anchors selected and the baseline view of                                    ✓         5          53                      101
+44   alignment on all datasets using our HBNC under the best parame-                                                1           48                     102
+45   ter settings when the best clustering performance is achieved. As                                              2           67                     103
+                                                                                       Caltech256
+46   shown in Table 1, our method does not always select the view with                                    ✓         3          62                      104
+                                                                                                                    4           45
+47   the largest number of anchors as the baseline view, because the                                                                                   105
+                                                                                                                    1           33
+48   quality of the anchor graph is not positively correlated with the                                              2           74
+                                                                                                                                                       106
+49   number of anchors. Figure 2 can also prove that determining the                      VGG2                                                         107
+                                                                                                          ✓         3          66
+50   baseline view by evaluating the quality of the anchor graph has a                                              4           38                     108
+51   beneficial effect on the clustering performance.                                                                                                  109
+52      In addition, we show the anchor selection results of the K-means                                                                               110
+53   and HBNC algorithms in three views on the ForestTypes dataset in         2.3    Visualization of Ablation Studies                                 111
+54   Figure 3. From the experimental results of the ForestTypes dataset,      We visualize the ablation experiment on the MFeat dataset. Since the     112
+55   as with the MFeat dataset, the baseline view we picked generally         baseline view of the MFeat dataset is also the first view, in order to   113
+56   has the strongest representation ability of anchors and can better       illustrate the effectiveness of our beaseline view alignment method,     114
+57   represent the internal structure in the original sample space.           we exchange two views of the MFeat dataset and reconstruct the           115
+58                                                                                                                                                     116
+      ACM MM, 2024, Melbourne, Australia                                                                                            Anonymous Authors
+
+
+117                                                                                                                                                     175
+118                                                                                                                                                     176
+119                                                                                                                                                     177
+120                                                                                                                                                     178
+121                                                                                                                                                     179
+122                                                                                                                                                     180
+123                                                                                                                                                     181
+124                                                                                                                                                     182
+125                                                                                                                                                     183
+126                                                                                                                                                     184
+127                                                                                                                                                     185
+128                                                                                                                                                     186
+129                                                                                                                                                     187
+130                                                                                                                                                     188
+131                                                                                                                                                     189
+132                                                                                                                                                     190
+133                                                                                                                                                     191
+134                                                                                                                                                     192
+135                                                                                                                                                     193
+136                                     Figure 2: The visualization of the anchor graphs on MFeat_test dataset.                                         194
+137                                                                                                                                                     195
+138                                                                                                                                                     196
+139                                                                                                                                                     197
+140                                                                                                                                                     198
+141                                                                                                                                                     199
+142                                                                                                                                                     200
+143                                                                                                                                                     201
+144                                                                                                                                                     202
+145                                                                                                                                                     203
+146                                                                                                                                                     204
+147                                                                                                                                                     205
+             (a) K-means on 1-st view            (b) HBNC on 1-st view                  (a) 3𝐴_𝑤/𝑜 _𝐴𝐵                      (b) 3𝐴𝑀𝑉 𝐶
+148                                                                                                                                                     206
+149                                                                                                                                                     207
+150
+                                                                              Figure 4: The comparison of visualization of the fused anchor             208
+151
+                                                                              graphs with 3𝐴_𝑤/𝑜_𝐴𝐵 and 3𝐴𝑀𝑉𝐶 on MFeat_test dataset.                    209
+152                                                                                                                                                     210
+153                                                                                  Table 2: Experiment results of ablation studies                    211
+154                                                                                                                                                     212
+155                                                                                    Datasets      Methods       ACC      NMI       Fscore            213
+156                                                                                                3𝐴_𝑛𝑒𝑖𝑡ℎ𝑒𝑟     0.8107   0.7226     0.6970            214
+157
+             (c) K-means on 2-nd view           (d) HBNC on 2-nd view                              3𝐴_𝑤/𝑜_𝑆𝐴      0.8107   0.7226     0.6970            215
+                                                                                      MFeat_test
+158                                                                                                3𝐴_𝑤/𝑜_𝐴𝐵      0.8520   0.8178     0.7806            216
+159                                                                                                  3𝐴𝑀𝑉 𝐶       0.8775   0.8298     0.8044            217
+160                                                                                                                                                     218
+161                                                                                                                                                     219
+162                                                                           MFeat_test dataset, aiming to provide a clearer and more illustrative     220
+163                                                                           depiction of the impact of our strategies. As mentioned earlier,          221
+164                                                                           methods that do not use either strategy are recorded as 3𝐴_𝑛𝑒𝑖𝑡ℎ𝑒𝑟 .      222
+165                                                                           3𝐴_𝑤/𝑜_𝑆𝐴 means that the anchors are not automatically selected,          223
+166                                                                           and we use the kmeans method instead. 3𝐴_𝑤/𝑜_𝐴𝐵 stands for not            224
+167
+             (e) K-means on 3-rd view            (f) HBNC on 3-rd view
+                                                                              aligning based on the baseline view, we align based on the first          225
+168                                                                           view uniformly. 3𝐴𝑀𝑉𝐶 means the complete algorithm.                       226
+169                                                                              The results of ablation experiments on the MFeat_test dataset          227
+170   Figure 3: The visualization of anchor selection on Forest-              are shown in Table 2. The effect of the baseline view is not reflected    228
+171   Types dataset.                                                          on 3𝐴_𝑤/𝑜_𝑆𝐴. We analyze that the 𝑘 anchors may not adequately            229
+172                                                                           capture the original spatial structure inherent in the data, which        230
+173                                                                           results in an ineffective alignment outcome.                              231
+174                                                                                                                                                     232
+      Supplementary Materials: Automatic and Aligned Anchor Learning Strategy for Multi-View Clustering                                 ACM MM, 2024, Melbourne, Australia
+
+
+233      We visualize the anchor graph of 3𝐴_𝑤/𝑜_𝑆𝐴 and 3𝐴𝑀𝑉𝐶 in                              In addition, we compare the visualization of the fusion anchor                   291
+234   Figure 2. In both methods, we take the representative anchor of                       graph Z𝐴𝑙𝑖𝑔𝑛𝑒𝑑 of 3𝐴_𝑤/𝑜_𝐴𝐵 and 3𝐴𝑀𝑉𝐶. Observing Figure 4,                         292
+235   the first cluster as an example. 3𝐴_𝑤/𝑜_𝑆𝐴 realizes the one-to-one                    we find that the clustering structure of the fused anchor graph can                293
+236   correspondence of the anchor 4 in view 1 according to the anchor 9                    be clearer by aligning the views according to the view with the                    294
+237   in the baseline view 2, while 3𝐴𝑀𝑉𝐶 method matches the anchor                         best anchor graph quality, which is conducive to improving the                     295
+238   48 of the base view 2 with the two representative anchors 10 and 13                   performance of clustering.                                                         296
+239   in view 1. Consequently, compared with 3𝐴_𝑤/𝑜_𝑆𝐴, our anchor                                                                                                             297
+240   selection strategy is more flexible, and the alignment matrix P can                    REFERENCES                                                                        298
+241   handle one-to-many or many-to-one matching relationships. In                           [1] Eugene L Lawler. 1963. The quadratic assignment problem. Management science   299
+                                                                                                 9, 4 (1963), 586–599.
+242   addition, from the fused anchor graph, no matter how the anchor                        [2] Yao Lu, Kaizhu Huang, and Cheng-Lin Liu. 2016. A fast projected fixed-point
+                                                                                                                                                                               300
+243   selection result is, the alignment operation can obtain a clearer                          algorithm for large graph matching. Pattern Recognition 60 (2016), 971–982.   301
+244   clustering structure.                                                                                                                                                    302
+245                                                                                                                                                                            303
+246                                                                                                                                                                            304
+247                                                                                                                                                                            305
+248                                                                                                                                                                            306
+249                                                                                                                                                                            307
+250                                                                                                                                                                            308
+251                                                                                                                                                                            309
+252                                                                                                                                                                            310
+253                                                                                                                                                                            311
+254                                                                                                                                                                            312
+255                                                                                                                                                                            313
+256                                                                                                                                                                            314
+257                                                                                                                                                                            315
+258                                                                                                                                                                            316
+259                                                                                                                                                                            317
+260                                                                                                                                                                            318
+261                                                                                                                                                                            319
+262                                                                                                                                                                            320
+263                                                                                                                                                                            321
+264                                                                                                                                                                            322
+265                                                                                                                                                                            323
+266                                                                                                                                                                            324
+267                                                                                                                                                                            325
+268                                                                                                                                                                            326
+269                                                                                                                                                                            327
+270                                                                                                                                                                            328
+271                                                                                                                                                                            329
+272                                                                                                                                                                            330
+273                                                                                                                                                                            331
+274                                                                                                                                                                            332
+275                                                                                                                                                                            333
+276                                                                                                                                                                            334
+277                                                                                                                                                                            335
+278                                                                                                                                                                            336
+279                                                                                                                                                                            337
+280                                                                                                                                                                            338
+281                                                                                                                                                                            339
+282                                                                                                                                                                            340
+283                                                                                                                                                                            341
+284                                                                                                                                                                            342
+285                                                                                                                                                                            343
+286                                                                                                                                                                            344
+287                                                                                                                                                                            345
+288                                                                                                                                                                            346
+289                                                                                                                                                                            347
+290                                                                                                                                                                            348
+

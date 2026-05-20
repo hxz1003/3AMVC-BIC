@@ -52,7 +52,7 @@ while flag
         theta(class,:) = mean(X0(target_label,:),1);
         nc = sum(target_label);
         num_class(class,:) = nc;
-        clear Xcalss;
+        clear Xclass;
         Xclass = X0(target_label,:);
         clear object_distance;
         for i=1:nc
@@ -71,7 +71,7 @@ while flag
         theta(class,:) = mean(X0(label==class,:),1);
         nc = sum(label==class);
         num_class(class,:) = nc;
-        clear Xcalss;
+        clear Xclass;
         Xclass = X0(label==class,:);
         clear object_distance;
         for i=1:nc

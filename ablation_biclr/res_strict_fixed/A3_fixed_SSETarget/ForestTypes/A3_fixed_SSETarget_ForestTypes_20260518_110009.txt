@@ -1,0 +1,33 @@
+fixed-parameter strict ablation 结果摘要
+method=A3_fixed_SSETarget
+dataset=ForestTypes
+fixedFrom=A0_best_res_biclr_refined
+changedOnly=仅将目标视图选择准则从 BICUnitEvidence 改为 SSEMin；不重新搜索参数。
+beta=200
+lambda=1000
+lambdaBIC=0.75
+minNodeSize=24
+numRuns=10
+seed=1
+targetView=3
+A0_targetView=3
+BIC_targetView=3
+SSE_targetView=3
+anchorCounts=[17 17 16]
+avgAnchors=16.666667
+acceptedSplits=[16 16 15]
+rejectedSplits=[17 17 16]
+meanLeafSize=[30.7647 30.7647 32.6875]
+maxDepth=[7 7 7]
+ACC_mean=0.758509, ACC_std=0.078924, ACC_best=0.818356
+NMI_mean=0.485882, NMI_std=0.048084, NMI_best=0.553049
+AR_mean=0.485688, AR_std=0.071096, AR_best=0.567660
+anchorTime=0.000000
+alignmentTime=0.804738
+modelTime=0.804738
+evalTime=0.050633
+totalTime=0.895573
+lambdaNotUsed=0
+useMultiViewFusion=1
+cacheHit=[true true true]
+notes=fixed-parameter strict ablation；参数来自 A0 best；不执行 grid search；仅将目标视图选择准则改为 SSEMin，同时保存 A0/BIC targetView 与 SSE targetView。

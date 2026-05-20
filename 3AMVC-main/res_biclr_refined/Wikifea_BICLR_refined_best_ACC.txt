@@ -2,80 +2,80 @@ BIC-LR 精细搜索最优 ACC 结果
 
 【一、按重复评价均值+标准差上界 ACC 最高】
 数据集：Wikifea
-来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Wikifea_BICLR_grid_20260512_150444.mat
+来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Wikifea_BICLR_grid_20260519_205426.mat
 选择准则：ACC
 选择口径：按重复评价均值+标准差上界
-beta=120
+beta=200
 lambda=10000
-lambdaBIC=4.5
-minNodeSize=30
+lambdaBIC=6
+minNodeSize=10
 tauSplit=0
 epsVar=1e-08
 randomSeed=1
 numRuns=8
 kmeansReplicates=4
 evalSummaryMode=bestacc
-bestEvalRun=1
-bestEvalSeed=1
-anchorCounts=[15 35]
+bestEvalRun=5
+bestEvalSeed=5
+anchorCounts=[12 28]
 targetView=2
 anchorQualityMethod=BICUnitEvidenceGain
-anchorEvidenceGain=[0.130309 0.476596]
+anchorEvidenceGain=[0.109934 0.412445]
 重复评价均值±标准差：
-ACC=0.556219 ± 0.022481
-NMI=0.505405 ± 0.006047
-Purity=0.600183 ± 0.012052
-Fscore=0.436150 ± 0.017708
+ACC=0.557528 ± 0.036734
+NMI=0.524636 ± 0.009322
+Purity=0.619766 ± 0.017452
+Fscore=0.469251 ± 0.023790
 重复评价逐指标范围：
-ACC=[0.512212, 0.581996]
-NMI=[0.494205, 0.513267]
-Purity=[0.586532, 0.621424]
-Fscore=[0.411577, 0.475074]
+ACC=[0.514306, 0.606769]
+NMI=[0.509983, 0.534788]
+Purity=[0.601884, 0.648639]
+Fscore=[0.437037, 0.497528]
 选优汇总指标：
-summaryACC=0.581996
-summaryNMI=0.513267
-summaryPurity=0.621424
-summaryFscore=0.475074
-bestRun指标：ACC=0.581996，NMI=0.513267，Purity=0.621424，Fscore=0.475074
-总耗时=420.47s
-缓存键=Wikifea_raw_view1_BICLR_lamBIC4p5_minNode30_seed1, Wikifea_raw_view2_BICLR_lamBIC4p5_minNode30_seed1
+summaryACC=0.606769
+summaryNMI=0.534456
+summaryPurity=0.648639
+summaryFscore=0.493566
+bestRun指标：ACC=0.606769，NMI=0.534456，Purity=0.648639，Fscore=0.493566
+总耗时=1774.31s
+缓存键=Wikifea_raw_view1_BICLR_lamBIC6_minNode10_tau0_eps1ep08_seed1_rmClutter0_capall, Wikifea_raw_view2_BICLR_lamBIC6_minNode10_tau0_eps1ep08_seed1_rmClutter0_capall
 
 【二、按重复评价平均 ACC 最高】
 数据集：Wikifea
-来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Wikifea_BICLR_grid_20260512_150444.mat
+来源结果文件：D:\matlab\3AMVC-BIC\3AMVC-main\res_biclr_refined\Wikifea_BICLR_grid_20260519_205426.mat
 选择准则：ACC
 选择口径：按重复评价平均
-beta=100
-lambda=10000
-lambdaBIC=4.5
-minNodeSize=30
+beta=200
+lambda=3000
+lambdaBIC=5
+minNodeSize=20
 tauSplit=0
 epsVar=1e-08
 randomSeed=1
 numRuns=8
 kmeansReplicates=4
 evalSummaryMode=bestacc
-bestEvalRun=7
-bestEvalSeed=7
-anchorCounts=[15 35]
+bestEvalRun=5
+bestEvalSeed=5
+anchorCounts=[15 28]
 targetView=2
 anchorQualityMethod=BICUnitEvidenceGain
-anchorEvidenceGain=[0.130309 0.476596]
+anchorEvidenceGain=[0.120511 0.48731]
 重复评价均值±标准差：
-ACC=0.557877 ± 0.013195
-NMI=0.520398 ± 0.009936
-Purity=0.616321 ± 0.010057
-Fscore=0.451136 ± 0.011111
+ACC=0.569304 ± 0.024319
+NMI=0.524529 ± 0.014233
+Purity=0.610345 ± 0.018613
+Fscore=0.454302 ± 0.028330
 重复评价逐指标范围：
-ACC=[0.534543, 0.575017]
-NMI=[0.495721, 0.527745]
-Purity=[0.593859, 0.627355]
-Fscore=[0.425285, 0.460650]
+ACC=[0.515352, 0.611305]
+NMI=[0.487898, 0.537485]
+Purity=[0.565597, 0.636427]
+Fscore=[0.386695, 0.495422]
 选优汇总指标：
-summaryACC=0.575017
-summaryNMI=0.527745
-summaryPurity=0.623866
-summaryFscore=0.460650
-bestRun指标：ACC=0.575017，NMI=0.527745，Purity=0.623866，Fscore=0.460650
-总耗时=420.47s
-缓存键=Wikifea_raw_view1_BICLR_lamBIC4p5_minNode30_seed1, Wikifea_raw_view2_BICLR_lamBIC4p5_minNode30_seed1
+summaryACC=0.611305
+summaryNMI=0.537485
+summaryPurity=0.636427
+summaryFscore=0.495422
+bestRun指标：ACC=0.611305，NMI=0.537485，Purity=0.636427，Fscore=0.495422
+总耗时=1774.31s
+缓存键=Wikifea_raw_view1_BICLR_lamBIC5_minNode20_tau0_eps1ep08_seed1_rmClutter0_capall, Wikifea_raw_view2_BICLR_lamBIC5_minNode20_tau0_eps1ep08_seed1_rmClutter0_capall

@@ -230,10 +230,21 @@ summary.targetView = alignmentInfo.targetView;
 summary.lambda = alignmentInfo.lambda;
 summary.objectiveName = alignmentInfo.objectiveName;
 summary.lossName = alignmentInfo.lossName;
+summary.alignmentMethod = get_optional_field(alignmentInfo, 'alignmentMethod', '');
+summary.weightDescription = get_optional_field(alignmentInfo, 'weightDescription', '');
+summary.fusionNormalization = get_optional_field(alignmentInfo, 'fusionNormalization', '');
 summary.maxObjectiveTraceByView = alignmentInfo.maxObjectiveTraceByView;
 summary.lossObjectiveTraceByView = alignmentInfo.lossObjectiveTraceByView;
 summary.totalMaxObjectiveTrace = alignmentInfo.totalMaxObjectiveTrace;
 summary.totalLossObjectiveTrace = alignmentInfo.totalLossObjectiveTrace;
+end
+
+function value = get_optional_field(inputStruct, fieldName, defaultValue)
+if isstruct(inputStruct) && isfield(inputStruct, fieldName) && ~isempty(inputStruct.(fieldName))
+    value = inputStruct.(fieldName);
+else
+    value = defaultValue;
+end
 end
 
 function config = fill_grid_config(datasetName, config, rootDir)
@@ -299,6 +310,22 @@ switch lower(datasetName)
         grid.maxAnchors = 300;
         grid.numRuns = 6;
         grid.kmeansReplicates = 3;
+    case 'bbcsport'
+        grid.betaList = [1 10 100 1000];
+        grid.lambdaList = [1e2 1e3 1e4];
+        grid.lambdaBICList = [0.22 0.5 1];
+        grid.minNodeSizeList = [8 16 32];
+        grid.maxAnchors = 250;
+        grid.numRuns = 6;
+        grid.kmeansReplicates = 3;
+    case 'dermatology'
+        grid.betaList = [1 10 100];
+        grid.lambdaList = [1e1 1e2 1e3];
+        grid.lambdaBICList = [0.5 1 2];
+        grid.minNodeSizeList = [5 10 20];
+        grid.maxAnchors = 200;
+        grid.numRuns = 6;
+        grid.kmeansReplicates = 3;
     case 'caltech101-all'
         grid.betaList = [10 100];
         grid.lambdaList = [1e2 1e3 1e4];
@@ -338,7 +365,7 @@ end
 end
 
 function [thetaall, objectAll, labelAll, qualityScores, targetView, infoAll, cacheInfo, totalAnchorTime] = ...
-    prepare_anchor_cache(X, Y, meta, anchorOptions, config)
+    prepare_anchor_cache(X, ~, meta, anchorOptions, config)
 numViews = numel(X);
 thetaall = cell(numViews, 1);
 objectAll = cell(numViews, 1);
@@ -378,7 +405,8 @@ for iv = 1:numViews
     end
 
     anchorTimer = tic;
-    [~, ~, label_neighbor, object, theta, ~, info] = Neighbor_BICLR(X{iv}, Y, anchorOptions);
+    % 锚点缓存阶段只需要锚点、SSE 与 BIC 证据，真实标签评价不参与后续网格搜索。
+    [~, ~, label_neighbor, object, theta, ~, info] = Neighbor_BICLR(X{iv}, [], anchorOptions);
     elapsed = toc(anchorTimer);
     totalAnchorTime = totalAnchorTime + elapsed;
 
